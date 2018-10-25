@@ -63,10 +63,21 @@ parts:
     plugin: dump
     source: glue
 
-  games:
+  sd2-apps:
     plugin: nil
     stage-packages:
       # SDL & working
     - neverball
     - neverputt
     - starfighter
+
+  qt-apps:
+    plugin: nil
+    stage-packages:
+    # Wayland paltform
+    - qtwayland5
+    # Qt games
+    - crawl-tiles
+    - caveexpress
+    # Terminal
+    - qterminal
