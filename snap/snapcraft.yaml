@@ -23,6 +23,8 @@ apps:
       EGMDE_DESKTOP_PATH: $SNAP/usr/share/applications
       SHELL: bash
       LC_ALL: C.UTF-8
+      LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
+      PATH: ${SNAP}/usr/games:{$PATH}
       #      XDG_RUNTIME_DIR: /run/user/0
       XDG_CONFIG_HOME: $SNAP_DATA
       XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
@@ -92,22 +94,27 @@ parts:
     - libsndfile1
     - libasyncns0
     - liblua5.2-0
+    - libslang2
+    - libglu1-mesa
+    - libgpm2
     # Debugging
     - gdb
+    - strace
 
-  sd2-apps:
-    plugin: nil
-    stage-packages:
-    - libsdl2-2.0-0
-    - libsdl2-image-2.0-0
-    - libsdl2-mixer-2.0-0
-    - libsdl2-net-2.0-0
-      # SDL2 games
-    - 7kaa
-    - neverball
-    - neverputt
-    - starfighter
-#    - caveexpress - hardcodes Lua path to /usr/share/games/caveexpress/
+# ** These fail to find pulsaudio (/run/user/0/pulse is empty)
+#  sd2-apps:
+#    plugin: nil
+#    stage-packages:
+#    - libsdl2-2.0-0
+#    - libsdl2-image-2.0-0
+#    - libsdl2-mixer-2.0-0
+#    - libsdl2-net-2.0-0
+#      # SDL2 games
+#    - 7kaa
+#    - neverball
+#    - neverputt
+#    - starfighter
+#    - caveexpress ** hardcodes Lua path to /usr/share/games/caveexpress/
 
   qt-apps:
     plugin: nil
@@ -121,10 +128,11 @@ parts:
     - libqt5x11extras5
     - libqtermwidget5-0
     # Apps
-    - qutebrowser
     - qterminal
-    - vlc-plugin-qt
-    - vlc
+    - qtcreator
+#    - qutebrowser    ** built for X11 only
+#    - vlc-plugin-qt **Hard coded path to vlc
+#    - vlc
 
 #  gtk3-apps:
 #    plugin: nil
@@ -152,8 +160,8 @@ parts:
 #    - xdg-user-dirs
 #    - ibus-gtk3
 #    - libibus-1.0-5
-#
+
 #  native-apps:
 #    plugin: nil
 #    stage-packages:
-#    - glmark2-es2-wayland
+#    - glmark2-es2-wayland ** Hard coded path to data

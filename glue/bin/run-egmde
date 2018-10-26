@@ -3,8 +3,12 @@
 export XDG_RUNTIME_DIR=/run/user/0 # hardcoding as root for now
 [ ! -d "$XDG_RUNTIME_DIR" ] && mkdir $XDG_RUNTIME_DIR -m 700
 
-export PATH="$SNAP/usr/games:$PATH"
-export LD_LIBRARY_PATH=$SNAP_LIBRARY_PATH:$LD_LIBRARY_PATH:$SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
+# Make PulseAudio socket available inside the snap-specific $XDG_RUNTIME_DIR
+pulsenative="pulse/native"
+pulseaudio_sockpath="$XDG_RUNTIME_DIR/$pulsenative"
+if [ -S "$pulseaudio_sockpath" ]; then
+    export PULSE_SERVER="unix:${pulseaudio_sockpath}"
+fi
 
 $SNAP/bin/egmde $@
 
