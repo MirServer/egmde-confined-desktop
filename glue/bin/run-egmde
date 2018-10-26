@@ -3,5 +3,8 @@
 export XDG_RUNTIME_DIR=/run/user/0 # hardcoding as root for now
 [ ! -d "$XDG_RUNTIME_DIR" ] && mkdir $XDG_RUNTIME_DIR -m 700
 
+export PATH="$SNAP/usr/games:$PATH"
+export LD_LIBRARY_PATH=$SNAP_LIBRARY_PATH:$LD_LIBRARY_PATH:$SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
+
 $SNAP/bin/egmde $@
 

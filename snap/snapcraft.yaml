@@ -17,8 +17,11 @@ apps:
       - wayland
     plugs:
       - opengl
+      - pulseaudio
     environment:
-      EGMDE_FONT: $SNAP/usr/share/fonts/truetype/freefont/FreeSansBold.ttf
+      EGMDE_FONT:         $SNAP/usr/share/fonts/truetype/freefont/FreeSansBold.ttf
+      EGMDE_DESKTOP_PATH: $SNAP/usr/share/applications
+      SHELL: bash
       LC_ALL: C.UTF-8
       #      XDG_RUNTIME_DIR: /run/user/0
       XDG_CONFIG_HOME: $SNAP_DATA
@@ -27,10 +30,28 @@ apps:
       # Prep for Mir
       MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
       MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
-      # Prep for Qt wayland
-      QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
       # Prep EGL
       __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
+      # Prep for Qt wayland
+      QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
+      QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
+      QTCHOOSER_NO_GLOBAL_DIR: 1
+      QT_SELECT: snappy-qt5
+      QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
+      # XDG Config
+      XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
+      XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
+      # Needed for fontconfig
+      XDG_DATA_HOME: ${SNAP}/usr/share
+      FONTCONFIG_PATH: ${SNAP}/etc/fonts/conf.d
+      FONTCONFIG_FILE: ${SNAP}/etc/fonts/fonts.conf
+      # GL Config
+      LIBGL_DRIVERS_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
+      # Alsa config
+      ALSA_CONFIG_PATH: ${SNAP}/usr/share/alsa
+      ALSA_MIXER_SIMPLE: ${SNAP}/usr/share/alsa
+      # Lua config
+      LUA_PATH: ${SNAP}/usr/share/games/caveexpress/
 
 parts:
   egmde:
@@ -63,21 +84,76 @@ parts:
     plugin: dump
     source: glue
 
+  misc:
+    plugin: nil
+    stage-packages:
+    - libxcb1
+    - libpulse0
+    - libsndfile1
+    - libasyncns0
+    - liblua5.2-0
+    # Debugging
+    - gdb
+
   sd2-apps:
     plugin: nil
     stage-packages:
-      # SDL & working
+    - libsdl2-2.0-0
+    - libsdl2-image-2.0-0
+    - libsdl2-mixer-2.0-0
+    - libsdl2-net-2.0-0
+      # SDL2 games
+    - 7kaa
     - neverball
     - neverputt
     - starfighter
+#    - caveexpress - hardcodes Lua path to /usr/share/games/caveexpress/
 
   qt-apps:
     plugin: nil
     stage-packages:
-    # Wayland paltform
+    # Wayland platform
     - qtwayland5
-    # Qt games
-    - crawl-tiles
-    - caveexpress
-    # Terminal
+    - libqt5core5a
+    - libqt5dbus5
+    - libqt5gui5
+    - libqt5widgets5
+    - libqt5x11extras5
+    - libqtermwidget5-0
+    # Apps
+    - qutebrowser
     - qterminal
+    - vlc-plugin-qt
+    - vlc
+
+#  gtk3-apps:
+#    plugin: nil
+#    stage-packages:
+#    - gnome-mahjongg
+#    - gnome-chess
+#    - gnuchess
+#    - gnuchess-book
+#    - aisleriot
+#    - gnome-cards-data
+#    - libxkbcommon0
+#    - ttf-ubuntu-font-family
+#    - dmz-cursor-theme
+#    - light-themes
+#    - adwaita-icon-theme
+#    - gnome-themes-standard
+#    - shared-mime-info
+#    - libgtk-3-0
+#    - libgdk-pixbuf2.0-0
+#    - libglib2.0-bin
+#    - libgtk-3-bin
+#    - unity-gtk3-module
+#    - libappindicator3-1
+#    - locales-all
+#    - xdg-user-dirs
+#    - ibus-gtk3
+#    - libibus-1.0-5
+#
+#  native-apps:
+#    plugin: nil
+#    stage-packages:
+#    - glmark2-es2-wayland
