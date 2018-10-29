@@ -2,8 +2,9 @@
 
 display_changes=0
 config_changes=0
-egmde_display="$SNAP_DATA/egmde.display"
-egmde_config="$SNAP_DATA/egmde.config"
+egmde_display="$SNAP_DATA/.config/egmde.display"
+egmde_config="$SNAP_DATA/.config/egmde.config"
+[ ! -d "$SNAP_DATA/.config" ] && mkdir $SNAP_DATA/.config -m 700
 
 # Ensure we have a config file with the fixed options
 if [ ! -e "${egmde_config}" ]; then

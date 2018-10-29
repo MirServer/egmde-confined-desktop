@@ -9,7 +9,7 @@ grade: stable
 base: core18
 
 apps:
-  egmde:
+  egmde-confined-desktop:
     command: bin/run-egmde
     daemon: simple
     slots:
@@ -25,10 +25,14 @@ apps:
       LC_ALL: C.UTF-8
       LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
       PATH: ${SNAP}/usr/games:{$PATH}
-      #      XDG_RUNTIME_DIR: /run/user/0
-      XDG_CONFIG_HOME: $SNAP_DATA
-      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
       XCURSOR_PATH:    $SNAP/icons
+      # XDG config
+      XDG_RUNTIME_DIR: $SNAP_DATA/xdg_runtime_dir
+      XDG_CONFIG_HOME: $SNAP_DATA/.config
+      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
+      XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
+      XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
+      XDG_DATA_HOME: ${SNAP}/usr/share
       # Prep for Mir
       MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
       MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
@@ -40,25 +44,29 @@ apps:
       QTCHOOSER_NO_GLOBAL_DIR: 1
       QT_SELECT: snappy-qt5
       QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
-      # XDG Config
-      XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
-      XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
       # Needed for fontconfig
-      XDG_DATA_HOME: ${SNAP}/usr/share
       FONTCONFIG_PATH: ${SNAP}/etc/fonts/conf.d
       FONTCONFIG_FILE: ${SNAP}/etc/fonts/fonts.conf
       # GL Config
       LIBGL_DRIVERS_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
       # Alsa config
+      ALSA_CONFIG_DIR: $SNAP/usr/share/alsa
       ALSA_CONFIG_PATH: ${SNAP}/usr/share/alsa
       ALSA_MIXER_SIMPLE: ${SNAP}/usr/share/alsa
       # Lua config
       LUA_PATH: ${SNAP}/usr/share/games/caveexpress/
+      # neverball
+      NEVERBALL_DATA: $SNAP/usr/share/games/neverball/
 
 parts:
   egmde:
     plugin: cmake
     source: https://github.com/AlanGriffiths/egmde.git
+#    override-build: |
+#      sudo apt --assume-yes install software-properties-common
+#      sudo add-apt-repository -yu ppa:mir-team/release
+#      sudo apt upgrade -y
+#      snapcraftctl build
     build-packages:
     - pkg-config
     - libmiral-dev
@@ -68,11 +76,6 @@ parts:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
     - libmiral3
-
-  mesa:
-    plugin: nil
-    stage-packages:
-      - libgl1-mesa-dri
 
   icons:
     plugin: nil
@@ -89,6 +92,7 @@ parts:
   misc:
     plugin: nil
     stage-packages:
+    - libgl1-mesa-dri
     - libxcb1
     - libpulse0
     - libsndfile1
@@ -97,23 +101,22 @@ parts:
     - libslang2
     - libglu1-mesa
     - libgpm2
+    - libgtk3-nocsd0
+    - dbus
     # Debugging
     - gdb
     - strace
 
-# ** These fail to find pulsaudio (/run/user/0/pulse is empty)
-#  sd2-apps:
-#    plugin: nil
-#    stage-packages:
-#    - libsdl2-2.0-0
-#    - libsdl2-image-2.0-0
-#    - libsdl2-mixer-2.0-0
-#    - libsdl2-net-2.0-0
-#      # SDL2 games
-#    - 7kaa
-#    - neverball
-#    - neverputt
-#    - starfighter
+  sd2-apps:
+    plugin: nil
+    stage-packages:
+    - libsdl2-2.0-0
+    - libsdl2-image-2.0-0
+    - libsdl2-mixer-2.0-0
+    - libsdl2-net-2.0-0
+      # SDL2 games
+    - neverball
+    - neverputt
 #    - caveexpress ** hardcodes Lua path to /usr/share/games/caveexpress/
 
   qt-apps:
@@ -151,6 +154,7 @@ parts:
 #    - gnome-themes-standard
 #    - shared-mime-info
 #    - libgtk-3-0
+#    - libgtk2.0-0
 #    - libgdk-pixbuf2.0-0
 #    - libglib2.0-bin
 #    - libgtk-3-bin
