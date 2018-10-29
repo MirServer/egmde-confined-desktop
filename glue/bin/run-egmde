@@ -1,6 +1,16 @@
 #!/bin/bash
 
 [ ! -d "$XDG_RUNTIME_DIR" ] && mkdir $XDG_RUNTIME_DIR -m 700
+[ ! -d "$XDG_CACHE_HOME" ] && mkdir $XDG_CACHE_HOME
+
+if [ ! -f "$GDK_PIXBUF_MODULE_FILE" ]; then
+    $GDK_PIXBUF_MODULEDIR/../../gdk-pixbuf-query-loaders > $GDK_PIXBUF_MODULE_FILE
+fi
+
+if [ ! -f "$XDG_CONFIG_HOME/gtk-3.0/settings.ini" ]; then
+    mkdir -p $XDG_CONFIG_HOME/gtk-3.0
+    cp $SNAP/etc/gtk-3.0/settings.ini $XDG_CONFIG_HOME/gtk-3.0
+fi
 
 # Make PulseAudio socket available inside the snap-specific $XDG_RUNTIME_DIR
 pulsenative="pulse/native"
@@ -10,12 +20,12 @@ if [ -S "$pulseaudio_sockpath" ]; then
 fi
 
 ## gnome-chess
-#if [ ! -f "$XDG_CONFIG_HOME/gnome-chess/engines.conf" ]; then
-#    mkdir -p $XDG_CONFIG_HOME/gnome-chess
-#    cp $SNAP/config/gnome-chess/engines.conf $XDG_CONFIG_HOME/gnome-chess
-#fi
+if [ ! -f "$XDG_CONFIG_HOME/gnome-chess/engines.conf" ]; then
+    mkdir -p $XDG_CONFIG_HOME/gnome-chess
+    cp $SNAP/config/gnome-chess/engines.conf $XDG_CONFIG_HOME/gnome-chess
+fi
 
 unset DISPLAY
 
-$SNAP/bin/egmde $@
+dbus-run-session -- $SNAP/bin/egmde $@
 

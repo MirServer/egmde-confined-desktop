@@ -18,21 +18,28 @@ apps:
     plugs:
       - opengl
       - pulseaudio
+      - gsettings
     environment:
       EGMDE_FONT:         $SNAP/usr/share/fonts/truetype/freefont/FreeSansBold.ttf
       EGMDE_DESKTOP_PATH: $SNAP/usr/share/applications
       SHELL: bash
       LC_ALL: C.UTF-8
       LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
-      PATH: ${SNAP}/usr/games:{$PATH}
+      PATH: ${SNAP}/usr/games:${PATH}
       XCURSOR_PATH:    $SNAP/icons
       # XDG config
       XDG_RUNTIME_DIR: $SNAP_DATA/xdg_runtime_dir
+      XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
       XDG_CONFIG_HOME: $SNAP_DATA/.config
       XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
       XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
       XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
       XDG_DATA_HOME: ${SNAP}/usr/share
+      # GDK/GTK
+      GDK_PIXBUF_MODULE_FILE: $SNAP_USER_COMMON/.cache/gdk-pixbuf-loaders.cache
+      GDK_PIXBUF_MODULEDIR: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders/
+      GTK_DATA_PREFIX: $SNAP/usr
+      GTK_EXE_PREFIX: $SNAP/usr
       # Prep for Mir
       MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
       MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
@@ -137,33 +144,33 @@ parts:
 #    - vlc-plugin-qt **Hard coded path to vlc
 #    - vlc
 
-#  gtk3-apps:
-#    plugin: nil
-#    stage-packages:
-#    - gnome-mahjongg
-#    - gnome-chess
-#    - gnuchess
-#    - gnuchess-book
-#    - aisleriot
-#    - gnome-cards-data
-#    - libxkbcommon0
-#    - ttf-ubuntu-font-family
-#    - dmz-cursor-theme
-#    - light-themes
-#    - adwaita-icon-theme
-#    - gnome-themes-standard
-#    - shared-mime-info
-#    - libgtk-3-0
-#    - libgtk2.0-0
-#    - libgdk-pixbuf2.0-0
-#    - libglib2.0-bin
-#    - libgtk-3-bin
-#    - unity-gtk3-module
-#    - libappindicator3-1
-#    - locales-all
-#    - xdg-user-dirs
-#    - ibus-gtk3
-#    - libibus-1.0-5
+  gtk3-apps:
+    plugin: nil
+    stage-packages:
+    - gnome-mahjongg
+    - gnome-chess
+    - gnuchess
+    - gnuchess-book
+    - aisleriot
+    - gnome-cards-data
+    - libxkbcommon0
+    - ttf-ubuntu-font-family
+    - dmz-cursor-theme
+    - light-themes
+    - adwaita-icon-theme
+    - gnome-themes-standard
+    - shared-mime-info
+    - libgtk-3-0
+    - libgtk2.0-0
+    - libgdk-pixbuf2.0-0
+    - libglib2.0-bin
+    - libgtk-3-bin
+    - unity-gtk3-module
+    - libappindicator3-1
+    - locales-all
+    - xdg-user-dirs
+    - ibus-gtk3
+    - libibus-1.0-5
 
 #  native-apps:
 #    plugin: nil
