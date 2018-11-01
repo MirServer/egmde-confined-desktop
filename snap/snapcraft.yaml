@@ -1,7 +1,7 @@
 name: egmde-confined-desktop
 version: egmde
 version-script: |
-  LANG=C apt-cache policy libmiral-dev | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/0.3-\1/p'
+  LANG=C apt-cache policy libmircore1 | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/0.1-mir\1/p'
 summary: A minimal Mir based desktop with some test applications
 description: A minimal Mir based desktop with some test applications
 confinement: strict
@@ -24,10 +24,11 @@ apps:
       SHELL: bash
       LC_ALL: C.UTF-8
       LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
-      PATH: ${SNAP}/usr/games:{$PATH}
+      PATH: ${SNAP}/usr/games:${PATH}
       XCURSOR_PATH:    $SNAP/icons
       # XDG config
       XDG_RUNTIME_DIR: $SNAP_DATA/xdg_runtime_dir
+      XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
       XDG_CONFIG_HOME: $SNAP_DATA/.config
       XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
       XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
@@ -59,14 +60,20 @@ apps:
       NEVERBALL_DATA: $SNAP/usr/share/games/neverball/
 
 parts:
+  ppa-mir-release:
+    plugin: nil
+    override-pull: |
+      sudo apt --assume-yes install software-properties-common
+      sudo add-apt-repository -yu ppa:mir-team/release
+      # We shouldn't need to install stuff here, but it seems to fix intermittent build failures
+      sudo apt --assume-yes install libmiral-dev mir-graphics-drivers-desktop
+      sudo apt clean
+      snapcraftctl pull
+
   egmde:
+    after: [ppa-mir-release]
     plugin: cmake
     source: https://github.com/AlanGriffiths/egmde.git
-#    override-build: |
-#      sudo apt --assume-yes install software-properties-common
-#      sudo add-apt-repository -yu ppa:mir-team/release
-#      sudo apt upgrade -y
-#      snapcraftctl build
     build-packages:
     - pkg-config
     - libmiral-dev

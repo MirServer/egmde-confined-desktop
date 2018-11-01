@@ -1,6 +1,7 @@
 #!/bin/bash
 
 [ ! -d "$XDG_RUNTIME_DIR" ] && mkdir $XDG_RUNTIME_DIR -m 700
+[ ! -d "$XDG_CACHE_HOME" ] && mkdir $XDG_CACHE_HOME
 
 # Make PulseAudio socket available inside the snap-specific $XDG_RUNTIME_DIR
 pulsenative="pulse/native"
@@ -15,7 +16,8 @@ fi
 #    cp $SNAP/config/gnome-chess/engines.conf $XDG_CONFIG_HOME/gnome-chess
 #fi
 
-unset DISPLAY
-
+cd $HOME
+unset DISPLAY # How does this get set?!
+#dbus-run-session -- $SNAP/bin/egmde $@
 $SNAP/bin/egmde $@
 
