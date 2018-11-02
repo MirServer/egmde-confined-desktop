@@ -3,9 +3,9 @@ version: egmde
 version-script: |
   LANG=C apt-cache policy libmircore1 | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/0.1-mir\1/p'
 summary: A minimal Mir based desktop with some test applications
-description: A minimal Mir based desktop with some test applications
+description: A minimal Mir based desktop with some test applications for demonstration purposes.
 confinement: strict
-grade: stable
+grade: devel
 base: core18
 
 apps:
@@ -24,10 +24,10 @@ apps:
       SHELL: bash
       LC_ALL: C.UTF-8
       LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
-      PATH: ${SNAP}/usr/games:${PATH}
+      PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
       XCURSOR_PATH:    $SNAP/icons
       # XDG config
-      XDG_RUNTIME_DIR: $SNAP_DATA/xdg_runtime_dir
+      XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
       XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
       XDG_CONFIG_HOME: $SNAP_DATA/.config
       XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
@@ -121,10 +121,11 @@ parts:
     - libsdl2-image-2.0-0
     - libsdl2-mixer-2.0-0
     - libsdl2-net-2.0-0
-      # SDL2 games
+    # SDL2 games
     - neverball
     - neverputt
-#    - caveexpress ** hardcodes Lua path to /usr/share/games/caveexpress/
+#    - caveexpress  ** hardcodes Lua path to /usr/share/games/caveexpress/
+#    - 0ad          ** Causes snap build to fail
 
   qt-apps:
     plugin: nil
@@ -138,13 +139,25 @@ parts:
     - libqt5x11extras5
     - libqtermwidget5-0
     # Apps
+    - stellarium
     - qterminal
     - qtcreator
+    - wireshark
+    - quiterss
+#    - kolourpaint    ** Pulls in kio, which adds ktelnetservice5.desktop (which fails to launch without URL)
 #    - qutebrowser    ** built for X11 only
-#    - vlc-plugin-qt **Hard coded path to vlc
+#    - falkon         ** built for X11 only
+#    - vlc-plugin-qt  **Hard coded path to vlc
 #    - vlc
 
 #  gtk3-apps:
+# I've given up trying to include GTK+ apps. There are a number
+# of configuration options to sort out for the non-desktop,
+# confined environment.
+# I found that dbus-run-session fails inside a confined snap,
+# and they all try to talk to dbus.
+# One day, there will be a good way to launch apps and they won't
+# need to be wrapped into this snap.
 #    plugin: nil
 #    stage-packages:
 #    - gnome-mahjongg

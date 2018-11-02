@@ -1,7 +1,13 @@
 #!/bin/bash
+set -e
 
-[ ! -d "$XDG_RUNTIME_DIR" ] && mkdir $XDG_RUNTIME_DIR -m 700
-[ ! -d "$XDG_CACHE_HOME" ] && mkdir $XDG_CACHE_HOME
+if [ ! -d "$XDG_RUNTIME_DIR" ]; then
+  mkdir -p $XDG_RUNTIME_DIR -m 700
+fi
+
+if [ ! -d "$XDG_CACHE_HOME" ]; then
+  mkdir -p $XDG_CACHE_HOME
+fi
 
 # Make PulseAudio socket available inside the snap-specific $XDG_RUNTIME_DIR
 pulsenative="pulse/native"
