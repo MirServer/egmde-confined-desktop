@@ -1,8 +1,14 @@
 #!/bin/bash
 set -e
 
-if [ ! -d "$XDG_RUNTIME_DIR" ]; then
-  mkdir -p $XDG_RUNTIME_DIR -m 700
+if [ -d /run/user/0 ] || mkdir -p /run/user/0 -m 700; then
+  # This works on Ubuntu Core
+  export XDG_RUNTIME_DIR=/run/user/0
+else
+  # This works on Ubuntu Classic
+  if [ ! -d "$XDG_RUNTIME_DIR" ]; then
+    mkdir -p $XDG_RUNTIME_DIR -m 700
+  fi
 fi
 
 if [ ! -d "$XDG_CACHE_HOME" ]; then
