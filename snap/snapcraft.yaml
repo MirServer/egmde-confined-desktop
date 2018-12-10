@@ -1,7 +1,7 @@
 name: egmde-confined-desktop
 version: egmde
 version-script: |
-  LANG=C apt-cache policy libmircore1 | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/0.1-mir\1/p'
+  LANG=C apt-cache policy libmircore1 | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/'$(git --git-dir=parts/egmde/src/.git rev-list --count HEAD)'-mir\1/p'
 summary: A minimal Mir based desktop with some test applications
 description: A minimal Mir based desktop with some test applications for demonstration purposes.
 confinement: strict
