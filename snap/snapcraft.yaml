@@ -79,6 +79,8 @@ parts:
     - libmiral-dev
     - libboost-filesystem-dev
     - libfreetype6-dev
+    - libwayland-dev
+    - libxkbcommon-dev
     stage-packages:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
