@@ -1,7 +1,5 @@
 #!/bin/bash
 
-snapctl set display-layout=default vt=5 cursor=auto
-
 # Hack to workaround issue #704
 if [[ $(uname -r) =~ ^.*raspi2$ ]]; then
   egmde_config="$SNAP_DATA/.config/egmde.config"
