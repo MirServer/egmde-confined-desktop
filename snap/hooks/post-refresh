@@ -1,13 +1,2 @@
 #!/bin/bash
 
-# Hack to workaround issue #704
-if [[ $(uname -r) =~ ^.*raspi2$ ]]; then
-  egmde_config="$SNAP_DATA/.config/egmde.config"
-  env_hacks=$(sed -n 's/^env-hacks=\(.*\)$/\1/p' ${egmde_config})
-  if [[ ! ${env_hacks} =~ .*MIR_MESA_KMS_DISABLE_MODESET_PROBE* ]]
-  then
-    sed --in-place '/^env-hacks=/d' ${egmde_config}
-    env_hacks=env-hacks=${env_hacks}:MIR_MESA_KMS_DISABLE_MODESET_PROBE
-    echo ${env_hacks/=:/=} >> "${egmde_config}"
-  fi
-fi
