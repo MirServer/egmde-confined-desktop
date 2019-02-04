@@ -6,6 +6,10 @@ confinement: strict
 grade: devel
 base: core18
 
+environment:
+  XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
+  XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
+
 apps:
   egmde-confined-desktop:
     command: bin/run-egmde
@@ -25,9 +29,7 @@ apps:
       PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
       XCURSOR_PATH:    $SNAP/icons
       # XDG config
-      XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
       XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
-      XDG_CONFIG_HOME: $SNAP_DATA/.config
       XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
       XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
       XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
@@ -152,6 +154,39 @@ parts:
 #    - falkon         ** built for X11 only
 #    - vlc-plugin-qt  **Hard coded path to vlc
 #    - vlc
+
+  snapcraft-desktop-helpers:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: gtk
+    plugin: make
+    make-parameters: ["FLAVOR=gtk3"]
+    build-packages:
+      - build-essential
+      - libgtk-3-dev
+    override-build: |
+      snapcraftctl build
+      # desktop-launch doesn't handle running without a user session very well, this avoids slow startup here
+      sed --in-place s'/^  needs_update=true/:/' $SNAPCRAFT_PART_INSTALL/bin/desktop-launch
+
+  gtk3-apps:
+    plugin: nil
+    stage-packages:
+      - gnome-sudoku
+
+# For GTK3+
+plugs:
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes
+  sound-themes:
+    interface: content
+    target: $SNAP/data-dir/sounds
+    default-provider: gtk-common-themes
 
 #  gtk3-apps:
 # I've given up trying to include GTK+ apps. There are a number
