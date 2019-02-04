@@ -1,7 +1,5 @@
 name: egmde-confined-desktop
-version: egmde
-version-script: |
-  LANG=C apt-cache policy libmircore1 | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/'$(git --git-dir=parts/egmde/src/.git rev-list --count HEAD)'-mir\1/p'
+adopt-info: egmde
 summary: A minimal Mir based desktop with some test applications
 description: A minimal Mir based desktop with some test applications for demonstration purposes.
 confinement: strict
@@ -72,6 +70,9 @@ parts:
 
   egmde:
     after: [ppa-mir-release]
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version `LANG=C apt-cache policy libmircore1 | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/'$(git --git-dir=$SNAPCRAFT_PART_SRC/.git rev-list --count HEAD)'-mir\1/p'`
     plugin: cmake
     source: https://github.com/AlanGriffiths/egmde.git
     build-packages:
