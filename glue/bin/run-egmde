@@ -1,14 +1,8 @@
 #!/bin/bash
 set -e
 
-# This works on Ubuntu Classic
-if [ ! -d "$XDG_RUNTIME_DIR" ]; then
-  mkdir -p $XDG_RUNTIME_DIR -m 700
-fi
-
-if [ ! -d "$XDG_CACHE_HOME" ]; then
-  mkdir -p $XDG_CACHE_HOME
-fi
+mkdir -p $XDG_RUNTIME_DIR -m 700
+mkdir -p $XDG_CACHE_HOME
 
 # Make PulseAudio socket available inside the snap-specific $XDG_RUNTIME_DIR
 pulsenative="pulse/native"
@@ -17,14 +11,7 @@ if [ -S "$pulseaudio_sockpath" ]; then
     export PULSE_SERVER="unix:${pulseaudio_sockpath}"
 fi
 
-## gnome-chess
-#if [ ! -f "$XDG_CONFIG_HOME/gnome-chess/engines.conf" ]; then
-#    mkdir -p $XDG_CONFIG_HOME/gnome-chess
-#    cp $SNAP/config/gnome-chess/engines.conf $XDG_CONFIG_HOME/gnome-chess
-#fi
-
 cd $HOME
 unset DISPLAY # How does this get set?!
-#dbus-run-session -- $SNAP/bin/egmde $@
 desktop-launch $SNAP/bin/egmde $@
 

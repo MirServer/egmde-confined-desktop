@@ -7,8 +7,35 @@ grade: devel
 base: core18
 
 environment:
+  SHELL: bash
+  LC_ALL: C.UTF-8
+  LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
+  PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
+  # XDG config
+  XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
+  XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
   XDG_RUNTIME_DIR: $SNAP_DATA/.xdg_runtime_dir
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
+  # Prep for Mir
+  MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
+  MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
+  # Prep for Qt wayland
+  QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
+  QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
+  QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
+  QTCHOOSER_NO_GLOBAL_DIR: 1
+  QT_SELECT: snappy-qt5
+
+passthrough:
+  layout:
+    /usr/share:
+      bind: $SNAP/usr/share
+    /etc/glvnd:
+      bind: $SNAP/etc/glvnd
+    /etc/gnome-chess:
+      bind: $SNAP/etc/gnome-chess
+    /etc/fonts:
+      bind: $SNAP/etc/fonts
 
 apps:
   egmde-confined-desktop:
@@ -20,44 +47,6 @@ apps:
     plugs:
       - opengl
       - pulseaudio
-    environment:
-      EGMDE_FONT:         $SNAP/usr/share/fonts/truetype/freefont/FreeSansBold.ttf
-      EGMDE_DESKTOP_PATH: $SNAP/usr/share/applications
-      SHELL: bash
-      LC_ALL: C.UTF-8
-      LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
-      PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
-      XCURSOR_PATH:    $SNAP/icons
-      # XDG config
-      XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
-      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
-      XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
-      XDG_DATA_DIRS: ${SNAP}/usr/share:$XDG_DATA_DIRS
-      XDG_DATA_HOME: ${SNAP}/usr/share
-      # Prep for Mir
-      MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
-      MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
-      # Prep EGL
-      __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
-      # Prep for Qt wayland
-      QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
-      QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
-      QTCHOOSER_NO_GLOBAL_DIR: 1
-      QT_SELECT: snappy-qt5
-      QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
-      # Needed for fontconfig
-      FONTCONFIG_PATH: ${SNAP}/etc/fonts/conf.d
-      FONTCONFIG_FILE: ${SNAP}/etc/fonts/fonts.conf
-      # GL Config
-      LIBGL_DRIVERS_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
-      # Alsa config
-      ALSA_CONFIG_DIR: $SNAP/usr/share/alsa
-      ALSA_CONFIG_PATH: ${SNAP}/usr/share/alsa
-      ALSA_MIXER_SIMPLE: ${SNAP}/usr/share/alsa
-      # Lua config
-      LUA_PATH: ${SNAP}/usr/share/games/caveexpress/
-      # neverball
-      NEVERBALL_DATA: $SNAP/usr/share/games/neverball/
 
 parts:
   ppa-mir-release:
@@ -67,7 +56,6 @@ parts:
       sudo add-apt-repository -yu ppa:mir-team/release
       # We shouldn't need to install stuff here, but it seems to fix intermittent build failures
       sudo apt --assume-yes install libmiral-dev mir-graphics-drivers-desktop
-      sudo apt clean
       snapcraftctl pull
 
   egmde:
@@ -92,10 +80,6 @@ parts:
   icons:
     plugin: nil
     stage-packages: [dmz-cursor-theme]
-    organize:
-      usr/share/icons/DMZ-White: icons/default
-    prime:
-     - icons/default
 
   glue:
     plugin: dump
@@ -129,7 +113,7 @@ parts:
     # SDL2 games
     - neverball
     - neverputt
-#    - caveexpress  ** hardcodes Lua path to /usr/share/games/caveexpress/
+    - caveexpress
 #    - 0ad          ** Causes snap build to fail
 
   qt-apps:
@@ -172,6 +156,15 @@ parts:
     plugin: nil
     stage-packages:
       - gnome-sudoku
+      - gnome-mahjongg
+      - gnome-chess
+      - gnuchess
+      - gnuchess-book
+
+  native-apps:
+    plugin: nil
+    stage-packages:
+      - glmark2-es2-wayland
 
 # For GTK3+
 plugs:
@@ -187,43 +180,3 @@ plugs:
     interface: content
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
-
-#  gtk3-apps:
-# I've given up trying to include GTK+ apps. There are a number
-# of configuration options to sort out for the non-desktop,
-# confined environment.
-# I found that dbus-run-session fails inside a confined snap,
-# and they all try to talk to dbus.
-# One day, there will be a good way to launch apps and they won't
-# need to be wrapped into this snap.
-#    plugin: nil
-#    stage-packages:
-#    - gnome-mahjongg
-#    - gnome-chess
-#    - gnuchess
-#    - gnuchess-book
-#    - aisleriot
-#    - gnome-cards-data
-#    - libxkbcommon0
-#    - ttf-ubuntu-font-family
-#    - dmz-cursor-theme
-#    - light-themes
-#    - adwaita-icon-theme
-#    - gnome-themes-standard
-#    - shared-mime-info
-#    - libgtk-3-0
-#    - libgtk2.0-0
-#    - libgdk-pixbuf2.0-0
-#    - libglib2.0-bin
-#    - libgtk-3-bin
-#    - unity-gtk3-module
-#    - libappindicator3-1
-#    - locales-all
-#    - xdg-user-dirs
-#    - ibus-gtk3
-#    - libibus-1.0-5
-
-#  native-apps:
-#    plugin: nil
-#    stage-packages:
-#    - glmark2-es2-wayland ** Hard coded path to data
