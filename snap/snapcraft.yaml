@@ -49,7 +49,7 @@ apps:
       - pulseaudio
 
 parts:
-  ppa-mir-release:
+  ppa-mir:
     plugin: nil
     override-pull: |
       sudo apt --assume-yes install software-properties-common
@@ -58,11 +58,26 @@ parts:
       sudo apt --assume-yes install libmiral-dev mir-graphics-drivers-desktop
       snapcraftctl pull
 
-  egmde:
-    after: [ppa-mir-release]
+  recipe-version:
+    after: [ppa-mir]
+    plugin: nil
+    source: .
+    source-type: git
     override-pull: |
       snapcraftctl pull
-      snapcraftctl set-version `LANG=C apt-cache policy libmircore1 | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/'$(git --git-dir=$SNAPCRAFT_PART_SRC/.git rev-list --count HEAD)'-mir\1/p'`
+      git rev-list --count HEAD > $SNAPCRAFT_PART_INSTALL/recipe-version
+    prime:
+      - recipe-version
+
+  egmde:
+    after: [ppa-mir, recipe-version]
+    override-pull: |
+      snapcraftctl pull
+      server_version=`git rev-list --count HEAD`
+      mir_version=`LANG=C apt-cache policy mir-graphics-drivers-desktop | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
+      recipe_version=`cat $SNAPCRAFT_STAGE/recipe-version`
+      snapcraftctl set-version $server_version-mir$mir_version-snap$recipe_version
+      if echo $mir_version | grep dev; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
     plugin: cmake
     source: https://github.com/AlanGriffiths/egmde.git
     build-packages:
