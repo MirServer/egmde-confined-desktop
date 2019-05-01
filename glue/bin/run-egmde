@@ -1,11 +1,23 @@
 #!/bin/bash
 set -e
 
-if [ -d /run/user/0 ] || mkdir -p /run/user/0 -m 700; then
-  # Until https://bugs.launchpad.net/snapd/+bug/1804869/ is resolved,
-  # this works on Ubuntu Core (and in devmode on Ubuntu Classic)
-  # but not confined on Ubuntu Classic
-  export XDG_RUNTIME_DIR=/run/user/0
+if [ $(id -u) ]; then
+  if [ ! -e $SNAP_COMMON/login-session-control.connected ]; then
+    echo To run as non-root user:
+    echo sudo snap connect egmde-confined-desktop:login-session-control :login-session-control
+  fi
+  echo To add to login shells:
+  echo sudo cp /snap/egmde-confined-desktop/current/usr/share/wayland-sessions/egmde-confined-desktop.desktop /usr/share/wayland-sessions/
+  if [ ! -e $SNAP_COMMON/login-session-control.connected ]; then
+    exit 1
+  fi
+else
+  if [ -d /run/user/0 ] || mkdir -p /run/user/0 -m 700; then
+    # Until https://bugs.launchpad.net/snapd/+bug/1804869/ is resolved,
+    # this works on Ubuntu Core (and in devmode on Ubuntu Classic)
+    # but not confined on Ubuntu Classic
+    export XDG_RUNTIME_DIR=/run/user/0
+  fi
 fi
 
 mkdir -p $XDG_RUNTIME_DIR -m 700
@@ -19,6 +31,5 @@ if [ -S "$pulseaudio_sockpath" ]; then
 fi
 
 cd $HOME
-unset DISPLAY # How does this get set?!
 desktop-launch $SNAP/bin/egmde $@
 
