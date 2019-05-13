@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+if daemon=$(snapctl get daemon); then
+  if [ -n "${daemon}" ]; then
+      exec "$SNAP/bin/run-egmde" "$@"
+  fi
+fi

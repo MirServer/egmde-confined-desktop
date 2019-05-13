@@ -11,6 +11,8 @@ if [ $(id -u) ]; then
   if [ ! -e $SNAP_COMMON/login-session-control.connected ]; then
     exit 1
   fi
+  echo To run as daemon:
+  echo sudo snap set egmde-confined-desktop daemon=enable
 else
   if [ -d /run/user/0 ] || mkdir -p /run/user/0 -m 700; then
     # Until https://bugs.launchpad.net/snapd/+bug/1804869/ is resolved,
@@ -31,5 +33,5 @@ if [ -S "$pulseaudio_sockpath" ]; then
 fi
 
 cd $HOME
-desktop-launch $SNAP/bin/egmde $@
+exec desktop-launch $SNAP/bin/egmde $@
 

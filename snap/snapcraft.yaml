@@ -39,7 +39,6 @@ layout:
 apps:
   egmde-confined-desktop:
     command: bin/run-egmde
-#    daemon: simple
     slots:
       - mir
       - wayland
@@ -47,6 +46,18 @@ apps:
       - opengl
       - pulseaudio
       - login-session-control
+      - x11
+
+  daemon:
+    command: bin/run-egmde-daemon
+    daemon: simple
+    restart-condition: on-failure
+    slots:
+      - mir
+      - wayland
+    plugs:
+      - opengl
+      - pulseaudio
 
 parts:
   ppa-mir:
