@@ -13,15 +13,9 @@ if [ $(id -u) ]; then
   fi
   echo To run as daemon:
   echo sudo snap set egmde-confined-desktop daemon=enable
-else
-  if [ -d /run/user/0 ] || mkdir -p /run/user/0 -m 700; then
-    # Until https://bugs.launchpad.net/snapd/+bug/1804869/ is resolved,
-    # this works on Ubuntu Core (and in devmode on Ubuntu Classic)
-    # but not confined on Ubuntu Classic
-    export XDG_RUNTIME_DIR=/run/user/0
-  fi
 fi
 
+export XDG_RUNTIME_DIR=$(dirname $XDG_RUNTIME_DIR)
 mkdir -p $XDG_RUNTIME_DIR -m 700
 mkdir -p $XDG_CACHE_HOME
 

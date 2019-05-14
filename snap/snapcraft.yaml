@@ -9,12 +9,11 @@ base: core18
 environment:
   SHELL: bash
   LC_ALL: C.UTF-8
-  LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
+  LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:{SNAP}/usr/lib/libreoffice/program/
   PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
   # XDG config
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
-  XDG_RUNTIME_DIR: $SNAP_USER_DATA/.xdg_runtime_dir
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
   # Prep for Mir
   MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
@@ -193,6 +192,7 @@ parts:
     plugin: nil
     stage-packages:
       - glmark2-es2-wayland
+      - libreoffice-gtk3
 
 # For GTK3+
 plugs:
