@@ -38,6 +38,7 @@ layout:
 apps:
   egmde-confined-desktop:
     command: bin/run-egmde
+    desktop: usr/share/wayland-sessions/egmde-confined-desktop.desktop
     slots:
       - mir
       - wayland
