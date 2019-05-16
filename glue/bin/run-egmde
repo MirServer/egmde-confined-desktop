@@ -1,18 +1,18 @@
 #!/bin/bash
 set -e
 
-if [ $(id -u) ]; then
-  if [ ! -e $SNAP_COMMON/login-session-control.connected ]; then
-    echo To run as non-root user:
-    echo sudo snap connect egmde-confined-desktop:login-session-control :login-session-control
-  fi
-  echo To add to login shells:
-  echo sudo cp /snap/egmde-confined-desktop/current/usr/share/wayland-sessions/egmde-confined-desktop.desktop /usr/share/wayland-sessions/
-  if [ ! -e $SNAP_COMMON/login-session-control.connected ]; then
-    exit 1
-  fi
-  echo To run as daemon:
-  echo sudo snap set egmde-confined-desktop daemon=enable
+if [ $(id -u) != 0 ] && [ ! -v DISPLAY ] && [ ! -e $SNAP_COMMON/login-session-control.connected ]; then
+  echo "ERROR: You need one of: root, a DISPLAY, or to connect the login-session-control interface."
+  echo ""
+  echo "To connect the login-session-control interface:"
+  echo "  sudo snap connect" $SNAP_NAME":login-session-control :login-session-control"
+  echo ""
+  echo "With the login-session-control interface connected, you can also add to login shells:"
+  echo "  sudo cp /snap/egmde-confined-desktop/current/usr/share/wayland-sessions/egmde-confined-desktop.desktop /usr/share/wayland-sessions/"
+  echo ""
+  echo "To run as daemon:"
+  echo "  sudo snap set egmde-confined-desktop daemon=enable"
+  exit 1
 fi
 
 export XDG_RUNTIME_DIR=$(dirname $XDG_RUNTIME_DIR)
