@@ -26,15 +26,16 @@ environment:
   QTCHOOSER_NO_GLOBAL_DIR: 1
   QT_SELECT: snappy-qt5
 
-layout:
-  /usr/share:
-    bind: $SNAP/usr/share
-  /etc/glvnd:
-    bind: $SNAP/etc/glvnd
-  /etc/gnome-chess:
-    bind: $SNAP/etc/gnome-chess
-  /etc/fonts:
-    bind: $SNAP/etc/fonts
+passthrough:
+  layout:
+    /usr/share:
+      bind: $SNAP/usr/share
+    /etc/glvnd:
+      bind: $SNAP/etc/glvnd
+    /etc/gnome-chess:
+      bind: $SNAP/etc/gnome-chess
+    /etc/fonts:
+      bind: $SNAP/etc/fonts
 
 apps:
   egmde-confined-desktop:
