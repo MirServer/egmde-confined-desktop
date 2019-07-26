@@ -6,7 +6,8 @@ class Ppa(nil.NilPlugin):
     @classmethod
     def schema(cls):
         schema = super().schema()
-        schema['properties']['ppa'] = { 'type': 'string', 'default': 'mir-team/release' }
+        schema['properties']['ppa'] = { 'type': 'string' }
+        schema['required'] = ['ppa']
         return schema
 
 
