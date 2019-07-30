@@ -1,3 +1,25 @@
 #!/bin/bash
 
-snapctl set display-layout=default vt=5 cursor=auto
+snap_core=$(sed -n 's/.*snap_core=\([^ ]*\).*/\1/p' /proc/cmdline)
+
+# On Ubuntu Core we default to daemon mode
+if [ ! -z "${snap_core}" ]
+then snapctl set daemon=true
+else snapctl set daemon=false
+fi
+
+# If 'vt.handoff' is set, Mir only starts first time on the default VT. (#779)
+# Until we understand and fix properly, set the config the way that works.
+vt=$(sed -n 's/.*vt.handoff=\([^ ]*\).*/\1/p' /proc/cmdline)
+if [ -z "${snap_core}" ] || [ -z "$vt" ]
+then snapctl set vt=5
+else snapctl set vt=0
+fi
+
+# On Ubuntu Core18 we default to software cursor
+if [[ "${snap_core}" =~ core18.*snap ]]
+then snapctl set cursor=software
+else snapctl set cursor=auto
+fi
+
+snapctl set display-layout=default

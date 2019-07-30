@@ -2,7 +2,7 @@
 set -e
 
 if daemon=$(snapctl get daemon); then
-  if [ -n "${daemon}" ]; then
+  if [ "${daemon}" == "true" ]; then
       exec "$SNAP/bin/run-egmde" "$@"
   fi
 fi
