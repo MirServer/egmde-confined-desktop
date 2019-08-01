@@ -9,7 +9,7 @@ base: core18
 environment:
   SHELL: bash
   LC_ALL: C.UTF-8
-  LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:{SNAP}/usr/lib/libreoffice/program/}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba
+  LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:${SNAP}/usr/lib/libreoffice/program/:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba
   PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
   # XDG config
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
@@ -43,19 +43,11 @@ apps:
       - mir
       - wayland
     plugs:
-      - opengl
-      - pulseaudio
       - login-session-control
       - x11
-      - alsa
-      - avahi-observe
-      - hardware-observe
-      - locale-control
-      - mount-observe
-      - network-observe
-      - removable-media
-      - shutdown
-      - system-observe
+    environment:
+      # Prep PulseAudio
+      PULSE_SERVER: unix:$XDG_RUNTIME_DIR/../pulse/native
 
   daemon:
     command: bin/run-egmde-daemon
@@ -64,9 +56,10 @@ apps:
     slots:
       - mir
       - wayland
-    plugs:
-      - opengl
-      - pulseaudio
+    environment:
+      # Prep PulseAudio
+      PULSE_SYSTEM: 1
+      PULSE_RUNTIME_PATH: /var/run/pulse
 
 parts:
   ppa-mir:
@@ -216,8 +209,19 @@ parts:
       - to amd64: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
       - to  i386: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
 
-# For GTK3+
 plugs:
+  opengl:
+  pulseaudio:
+  alsa:
+  avahi-observe:
+  hardware-observe:
+  locale-control:
+  mount-observe:
+  network-observe:
+  removable-media:
+  shutdown:
+  system-observe:
+  # For GTK3+
   gtk-3-themes:
     interface: content
     target: $SNAP/data-dir/themes
