@@ -11,7 +11,7 @@ if [ $(id -u) != 0 ] && [ ! -v DISPLAY ] && [ ! -e $SNAP_COMMON/login-session-co
   echo "  sudo cp /snap/egmde-confined-desktop/current/usr/share/wayland-sessions/egmde-confined-desktop.desktop /usr/share/wayland-sessions/"
   echo ""
   echo "To run as daemon:"
-  echo "  sudo snap set egmde-confined-desktop daemon=enable"
+  echo "  sudo snap set egmde-confined-desktop daemon=true"
   exit 1
 fi
 
