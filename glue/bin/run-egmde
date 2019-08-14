@@ -1,13 +1,21 @@
 #!/bin/bash
 set -e
 
-if [ -d /run/user/0 ] || mkdir -p /run/user/0 -m 700; then
-  # Until https://bugs.launchpad.net/snapd/+bug/1804869/ is resolved,
-  # this works on Ubuntu Core (and in devmode on Ubuntu Classic)
-  # but not confined on Ubuntu Classic
-  export XDG_RUNTIME_DIR=/run/user/0
+if [ $(id -u) != 0 ] && [ ! -v DISPLAY ] && [ ! -e $SNAP_COMMON/login-session-control.connected ]; then
+  echo "ERROR: You need one of: root, a DISPLAY, or to connect the login-session-control interface."
+  echo ""
+  echo "To connect the login-session-control interface:"
+  echo "  sudo snap connect" $SNAP_NAME":login-session-control :login-session-control"
+  echo ""
+  echo "With the login-session-control interface connected, you can also add to login shells:"
+  echo "  sudo cp /snap/egmde-confined-desktop/current/usr/share/wayland-sessions/egmde-confined-desktop.desktop /usr/share/wayland-sessions/"
+  echo ""
+  echo "To run as daemon:"
+  echo "  sudo snap set egmde-confined-desktop daemon=true"
+  exit 1
 fi
 
+export XDG_RUNTIME_DIR=$(dirname $XDG_RUNTIME_DIR)
 mkdir -p $XDG_RUNTIME_DIR -m 700
 mkdir -p $XDG_CACHE_HOME
 
@@ -19,6 +27,5 @@ if [ -S "$pulseaudio_sockpath" ]; then
 fi
 
 cd $HOME
-unset DISPLAY # How does this get set?!
-desktop-launch $SNAP/bin/egmde $@
+exec desktop-launch $SNAP/bin/egmde $@
 
