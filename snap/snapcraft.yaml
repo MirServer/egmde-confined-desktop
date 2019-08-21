@@ -199,6 +199,28 @@ parts:
       - to amd64: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
       - to  i386: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
 
+  emulationstation:
+    plugin: cmake
+    source: https://github.com/Aloshi/EmulationStation.git
+    build-packages:
+      - libsdl2-dev
+      - libboost-system-dev
+      - libboost-filesystem-dev
+      - libboost-date-time-dev
+      - libboost-locale-dev
+      - libfreeimage-dev
+      - libfreetype6-dev
+      - libeigen3-dev
+      - libcurl4-openssl-dev
+      - libasound2-dev
+      - libgl1-mesa-dev
+    stage-packages:
+      - libsdl2-2.0-0
+      - libfreeimage3
+      - libfreetype6
+      - libcurl4
+      - libasound2
+
 plugs:
   opengl:
   pulseaudio:
