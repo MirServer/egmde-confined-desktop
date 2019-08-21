@@ -4,14 +4,8 @@ set -e
 if [ $(id -u) != 0 ] && [ ! -v DISPLAY ] && [ ! -e $SNAP_COMMON/login-session-control.connected ]; then
   echo "ERROR: You need one of: root, a DISPLAY, or to connect the login-session-control interface."
   echo ""
-  echo "To connect the login-session-control interface:"
-  echo "  sudo snap connect" $SNAP_NAME":login-session-control :login-session-control"
-  echo ""
-  echo "With the login-session-control interface connected, you can also add to login shells:"
-  echo "  sudo cp /snap/egmde-confined-desktop/current/usr/share/wayland-sessions/egmde-confined-desktop.desktop /usr/share/wayland-sessions/"
-  echo ""
-  echo "To run as daemon:"
-  echo "  sudo snap set egmde-confined-desktop daemon=true"
+  echo "To connect the login-session-control interface and add to the login menu:"
+  echo "  /snap/egmde-confined-desktop/current/bin/setup.sh"
   exit 1
 fi
 
@@ -19,13 +13,6 @@ export XDG_RUNTIME_DIR=$(dirname $XDG_RUNTIME_DIR)
 mkdir -p $XDG_RUNTIME_DIR -m 700
 mkdir -p $XDG_CACHE_HOME
 
-# Make PulseAudio socket available inside the snap-specific $XDG_RUNTIME_DIR
-pulsenative="pulse/native"
-pulseaudio_sockpath="$XDG_RUNTIME_DIR/$pulsenative"
-if [ -S "$pulseaudio_sockpath" ]; then
-    export PULSE_SERVER="unix:${pulseaudio_sockpath}"
-fi
-
 cd $HOME
-exec desktop-launch $SNAP/bin/egmde $@
+exec $SNAP/bin/egmde $@
 

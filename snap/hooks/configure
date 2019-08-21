@@ -126,12 +126,3 @@ if [ -n "${cursor}" ]; then
     let config_changes+=1
   fi
 fi
-
-#if [ $(($config_changes+$display_changes)) -gt 0 ]; then
-#  snapctl restart $SNAP_NAME
-#fi
-if daemon=$(snapctl get daemon); then
-  if [ -n "${daemon}" ]; then
-    snapctl restart $SNAP_NAME
-  fi
-fi
