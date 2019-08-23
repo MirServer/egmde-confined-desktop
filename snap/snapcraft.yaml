@@ -73,6 +73,7 @@ parts:
     - libfreetype6-dev
     - libwayland-dev
     - libxkbcommon-dev
+    - libglib2.0-dev
     stage-packages:
     - fonts-freefont-ttf
     - mir-graphics-drivers-desktop
