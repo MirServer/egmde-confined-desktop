@@ -40,7 +40,6 @@ apps:
     command: bin/run-egmde
     desktop: usr/share/wayland-sessions/egmde-confined-desktop.desktop
     slots:
-      - mir
       - wayland
     plugs:
       - login-session-control
