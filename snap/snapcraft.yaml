@@ -184,7 +184,6 @@ parts:
     plugin: nil
     stage-packages:
       - glmark2-es2-wayland
-      - libreoffice-gtk3
 
   kodi:
     plugin: ppa
