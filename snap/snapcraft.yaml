@@ -18,7 +18,6 @@ environment:
   # Prep for Mir
   MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
-  __EGL_VENDOR_LIBRARY_DIRS: $SNAP/etc/glvnd/egl_vendor.d:$SNAP/usr/share/glvnd/egl_vendor.d
   LIBGL_DRIVERS_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
   LIBVA_DRIVERS_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
 
@@ -27,8 +26,12 @@ layout:
     bind: $SNAP/usr/share/X11
   /etc/glvnd:
     bind: $SNAP/etc/glvnd
+  /usr/share/glvnd:
+    bind: $SNAP/usr/share/glvnd
   /etc/fonts:
     bind: $SNAP/etc/fonts
+  /usr/share/fonts:
+    bind: $SNAP/usr/share/fonts
 
 apps:
   egmde-confined-desktop:
@@ -109,5 +112,5 @@ parts:
     - strace
 
 plugs:
-  desktop:
+  shell-support:
   opengl:
