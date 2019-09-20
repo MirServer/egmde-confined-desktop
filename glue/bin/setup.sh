@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# To launch other snaps
+sudo snap connect egmde-confined-desktop:app-launch
+
 # For DM
 sudo snap connect egmde-confined-desktop:login-session-control
 if [ -d "/usr/share/wayland-sessions/" ]
