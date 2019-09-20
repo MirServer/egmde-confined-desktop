@@ -113,5 +113,5 @@ parts:
     - strace
 
 plugs:
-  shell-support:
+  app-launch:
   opengl:
