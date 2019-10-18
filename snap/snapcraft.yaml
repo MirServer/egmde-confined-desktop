@@ -197,6 +197,7 @@ slots:
 
 plugs:
   opengl:
+  audio-playback:
   pulseaudio:
   alsa:
   avahi-observe:
