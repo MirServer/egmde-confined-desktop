@@ -9,31 +9,57 @@ base: core18
 environment:
   SHELL: bash
   LC_ALL: C.UTF-8
-  LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:${SNAP}/usr/lib/libreoffice/program/:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba
-  PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
+  LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:/usr/lib/libreoffice/program/:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba
+  PATH: $SNAP/bin/:$SNAP/usr/bin/:/usr/games:${PATH}
   # XDG config
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
   # Prep for Mir
-  MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
-  MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
-  # Prep for Qt wayland
-  QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
-  QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
-  QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
   QTCHOOSER_NO_GLOBAL_DIR: 1
   QT_SELECT: snappy-qt5
 
 layout:
-  /usr/share:
-    bind: $SNAP/usr/share
-  /etc/glvnd:
-    bind: $SNAP/etc/glvnd
   /etc/gnome-chess:
     bind: $SNAP/etc/gnome-chess
+  /usr/share/gnome-chess:
+    bind: $SNAP/usr/share/gnome-chess
+  /usr/share/gnuchess:
+    bind: $SNAP/usr/share/gnuchess
+  /usr/share/gnome-mahjongg:
+    bind: $SNAP/usr/share/gnome-mahjongg
+  /usr/share/kodi:
+    bind: $SNAP/usr/share/kodi
+  /usr/share/games:
+    bind: $SNAP/usr/share/games
+  /usr/games:
+    bind: $SNAP/usr/games
+  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:
+    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
+  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba:
+    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba
+  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5:
+    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5
+  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri:
+    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
+  /usr/share/applications:
+    bind: $SNAP/usr/share/applications
+  /etc/glvnd:
+    bind: $SNAP/etc/glvnd
   /etc/fonts:
     bind: $SNAP/etc/fonts
+  /etc/xdg:
+    bind: $SNAP/etc/xdg
+  /usr/share/X11/xkb:
+    bind: $SNAP/usr/share/X11/xkb
+  /usr/share/fonts:
+    bind: $SNAP/usr/share/fonts
+  /usr/share/glvnd:
+    bind: $SNAP/usr/share/glvnd
+  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform:
+    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
+  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform:
+    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
 
 apps:
   egmde-confined-desktop:
@@ -183,11 +209,6 @@ parts:
   kodi:
     plugin: ppa
     ppa: team-xbmc/ppa
-    override-stage: |
-      if [ -e "$SNAPCRAFT_PART_INSTALL/usr/bin/kodi" ]; then
-        sed --in-place s'!/usr!${SNAP}/usr!' $SNAPCRAFT_PART_INSTALL/usr/bin/kodi
-      fi
-      snapcraftctl stage
     stage-packages:
       - to amd64: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
       - to  i386: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
