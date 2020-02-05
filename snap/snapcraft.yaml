@@ -20,6 +20,8 @@ environment:
   QT_SELECT: snappy-qt5
 
 layout:
+  /usr/bin/qterminal:
+    symlink: $SNAP/usr/bin/qterminal
   /etc/gnome-chess:
     bind: $SNAP/etc/gnome-chess
   /usr/share/gnome-chess:
