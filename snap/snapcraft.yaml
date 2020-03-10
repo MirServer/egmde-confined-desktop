@@ -35,6 +35,8 @@ layout:
     bind: $SNAP/usr/share/kodi
   /usr/share/games:
     bind: $SNAP/usr/share/games
+  /usr/share/glmark2:
+    bind: $SNAP/usr/share/glmark2
   /usr/share/X11/xkb:
     bind: $SNAP/usr/share/X11/xkb
   /usr/share/fonts:
