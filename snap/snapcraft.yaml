@@ -32,13 +32,13 @@ layout:
     bind: $SNAP/etc/fonts
   /usr/share/fonts:
     bind: $SNAP/usr/share/fonts
+  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/mir
 
 apps:
   egmde-confined-desktop:
     command: bin/run-egmde
     desktop: usr/share/wayland-sessions/egmde-confined-desktop.desktop
-    slots:
-      - wayland
     plugs:
       - login-session-control
       - x11
@@ -79,10 +79,10 @@ parts:
     - libxkbcommon-dev
     - libglib2.0-dev
     stage-packages:
-    - fonts-freefont-ttf
-    - mir-graphics-drivers-desktop
-    - libmiral3
-    - libfreetype6
+      - try: [libmiral4]
+      - else: [libmiral3]
+      - mir-graphics-drivers-desktop
+      - libfreetype6
     stage:
       - -usr/share/wayland-sessions/egmde.desktop
 
