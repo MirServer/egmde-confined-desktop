@@ -122,6 +122,6 @@ parts:
     - strace
 
 plugs:
-  app-launch:
+  desktop-launch:
   opengl:
   network-bind:
