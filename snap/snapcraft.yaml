@@ -13,7 +13,7 @@ environment:
   PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
   # XDG config
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
-  XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
+  XDG_DATA_DIRS:   $SNAP/usr/share
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
   # Prep for Mir
   MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
@@ -44,7 +44,7 @@ apps:
       - x11
     environment:
       EGMDE_SNAPCRAFT_LAUNCH: 1
-      EGMDE_DESKTOP_PATH: /var/lib/snapd/desktop/applications
+      XDG_DATA_DIRS:   /var/lib/snapd/desktop
 
 parts:
   recipe-version:
@@ -61,15 +61,14 @@ parts:
     after: [recipe-version]
     override-pull: |
       snapcraftctl pull
-      server_version=`git rev-list --count HEAD`
+      server_version=0.1
       mir_version=`LANG=C apt-cache policy mir-graphics-drivers-desktop | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
       recipe_version=`cat $SNAPCRAFT_STAGE/recipe-version`
       snapcraftctl set-version $server_version-mir$mir_version-snap$recipe_version
 #      if echo $mir_version | grep dev; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
     plugin: cmake-with-ppa
     ppa: mir-team/dev
-    source: https://github.com/AlanGriffiths/egmde.git
-    source-branch: snapcraft-Launcher
+    source: egmde
     build-packages:
     - pkg-config
     - libmiral-dev
@@ -83,6 +82,7 @@ parts:
       - else: [libmiral3]
       - mir-graphics-drivers-desktop
       - libfreetype6
+      - fonts-freefont-ttf
     stage:
       - -usr/share/wayland-sessions/egmde.desktop
 
