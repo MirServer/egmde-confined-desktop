@@ -18,6 +18,7 @@ environment:
   # Prep for Mir
   MIR_CLIENT_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/client-platform
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
+  MIR_SERVER_XWAYLAND_PATH: ${SNAP}/usr/bin/Xwayland
   LIBGL_DRIVERS_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
   LIBVA_DRIVERS_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
 
@@ -39,6 +40,8 @@ apps:
   egmde-confined-desktop:
     command: bin/run-egmde
     desktop: usr/share/wayland-sessions/egmde-confined-desktop.desktop
+    slots:
+      - wayland
     plugs:
       - login-session-control
       - x11
@@ -86,6 +89,12 @@ parts:
     stage:
       - -usr/share/wayland-sessions/egmde.desktop
 
+  xwayland:
+    plugin: nil
+    stage-packages:
+      - xwayland
+      - libbz2-1.0
+
   icons:
     plugin: nil
     stage-packages: [dmz-cursor-theme]
@@ -115,3 +124,4 @@ parts:
 plugs:
   app-launch:
   opengl:
+  network-bind:
