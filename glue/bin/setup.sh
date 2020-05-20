@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # To launch other snaps
-sudo snap connect egmde-confined-desktop:app-launch
+sudo snap connect egmde-confined-desktop:desktop-launch
 
 # For DM
 sudo snap connect egmde-confined-desktop:login-session-control
