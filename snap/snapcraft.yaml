@@ -106,6 +106,7 @@ parts:
       - else: [libmiral3]
       - mir-graphics-drivers-desktop
       - libfreetype6
+      - fonts-freefont-ttf
     stage:
       - -usr/share/wayland-sessions/egmde.desktop
 
