@@ -39,8 +39,8 @@ layout:
     bind: $SNAP/usr/share/glmark2
   /usr/share/X11/xkb:
     bind: $SNAP/usr/share/X11/xkb
-  /usr/share/fonts:
-    bind: $SNAP/usr/share/fonts
+  /usr/share/fonts/truetype/freefont:
+    bind: $SNAP/usr/share/fonts/truetype/freefont
   /usr/share/glvnd:
     bind: $SNAP/usr/share/glvnd
   /etc/glvnd:
