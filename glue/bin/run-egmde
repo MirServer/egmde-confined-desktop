@@ -5,7 +5,7 @@ if [ "$(id -u)" != 0 ] && [ -z "$DISPLAY" ] && [ ! -e "$SNAP_COMMON/login-sessio
   echo "ERROR: You need one of: root, a DISPLAY, or to connect the login-session-control interface."
   echo ""
   echo "To connect the login-session-control interface:"
-  echo "  sudo snap connect" $SNAP_NAME":login-session-control :login-session-control"
+  echo "  sudo snap connect $SNAP_NAME:login-session-control :login-session-control"
   echo ""
   echo "With the login-session-control interface connected, you can also add to login shells:"
   echo "  sudo cp /snap/egmde-confined-desktop/current/usr/share/wayland-sessions/egmde-confined-desktop.desktop /usr/share/wayland-sessions/"
@@ -15,11 +15,10 @@ if [ "$(id -u)" != 0 ] && [ -z "$DISPLAY" ] && [ ! -e "$SNAP_COMMON/login-sessio
   exit 1
 fi
 
-mkdir -p $XDG_RUNTIME_DIR -m 700
-mkdir -p $XDG_CACHE_HOME
+mkdir -p "$XDG_RUNTIME_DIR" -m 700
+mkdir -p "$XDG_CACHE_HOME"
 
-for hack in $(find ${SNAP}/hacks -name setup-\*); do . $hack; done
+for hack in $(find "${SNAP}/hacks" -name setup-\*); do . "$hack"; done
 
-cd $HOME
-exec desktop-launch $SNAP/bin/egmde $@
-
+cd
+exec desktop-launch "$SNAP/bin/egmde" "$@"
