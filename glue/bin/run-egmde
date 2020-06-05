@@ -26,6 +26,8 @@ if [ -S "$pulseaudio_sockpath" ]; then
     export PULSE_SERVER="unix:${pulseaudio_sockpath}"
 fi
 
+for hack in $(find ${SNAP}/hacks -name setup-\*); do . $hack; done
+
 cd $HOME
 exec desktop-launch $SNAP/bin/egmde $@
 

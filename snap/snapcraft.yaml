@@ -185,6 +185,16 @@ parts:
       # desktop-launch doesn't handle running without a user session very well, this avoids slow startup here
       sed --in-place s'/^  needs_update=true/:/' $SNAPCRAFT_PART_INSTALL/bin/desktop-launch
 
+  firefox:
+    after:
+      - snapcraft-desktop-helpers
+    plugin: nil
+    override-stage: |
+      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/python3.6.desktop
+      snapcraftctl stage
+    stage-packages:
+      - firefox
+
   gtk3-apps:
     plugin: nil
     stage-packages:
