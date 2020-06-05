@@ -222,6 +222,10 @@ parts:
       - to amd64: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
       - to  i386: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
 
+slots:
+  internal-wayland-server:
+    interface: wayland
+
 plugs:
   opengl:
   audio-playback:
