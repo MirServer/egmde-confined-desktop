@@ -18,13 +18,6 @@ fi
 mkdir -p $XDG_RUNTIME_DIR -m 700
 mkdir -p $XDG_CACHE_HOME
 
-# Make PulseAudio socket available inside the snap-specific $XDG_RUNTIME_DIR
-pulsenative="pulse/native"
-pulseaudio_sockpath="$XDG_RUNTIME_DIR/$pulsenative"
-if [ -S "$pulseaudio_sockpath" ]; then
-    export PULSE_SERVER="unix:${pulseaudio_sockpath}"
-fi
-
 for hack in $(find ${SNAP}/hacks -name setup-\*); do . $hack; done
 
 cd $HOME
