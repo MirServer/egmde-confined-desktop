@@ -25,6 +25,8 @@ environment:
 layout:
   /usr/bin/qterminal:
     symlink: $SNAP/usr/bin/qterminal
+  /usr/bin/xkbcomp:
+    symlink: $SNAP/usr/bin/xkbcomp
   /usr/share/gnome-chess:
     bind: $SNAP/usr/share/gnome-chess
   /usr/share/gnuchess:
@@ -94,6 +96,7 @@ parts:
       snapcraftctl set-version $server_version-mir$mir_version-snap$recipe_version
 #      if echo $mir_version | grep dev; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
     plugin: cmake-with-ppa
+    ppa: mir-team/dev
     source: https://github.com/AlanGriffiths/egmde.git
     build-packages:
     - pkg-config
@@ -132,10 +135,12 @@ parts:
     - libglu1-mesa
     - libgpm2
     - libgtk3-nocsd0
-    - dbus
-    # Debugging
-    - gdb
-    - strace
+
+  xwayland:
+    plugin: nil
+    stage-packages:
+      - xwayland
+      - libbz2-1.0
 
   sd2-apps:
     plugin: nil
@@ -222,9 +227,9 @@ parts:
       - to amd64: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
       - to  i386: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
 
-slots:
-  internal-wayland-server:
-    interface: wayland
+#slots:
+#  internal-wayland-server:
+#    interface: wayland
 
 plugs:
   opengl:

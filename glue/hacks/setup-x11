@@ -1,0 +1,19 @@
+#!/bin/sh
+
+export MIR_SERVER_XWAYLAND_PATH=${SNAP}/usr/bin/Xwayland
+export MIR_SERVER_ENABLE_X11=1
+
+mkdir -p /tmp/.X11-unix
+
+# We need to stop Mir accessing any existing X11 session.
+# Mir detects existing sessions my scanning /tmp/.X11-unix
+# but we don't have the real /tmp, but a snap specific one.
+# So fake the existing $DISPLAY in the fake /tmp/.X11-unix
+touch /tmp/.X11-unix/X${DISPLAY:-1}
+
+# A few more for luck
+touch /tmp/.X11-unix/X0
+touch /tmp/.X11-unix/X1
+touch /tmp/.X11-unix/X2
+touch /tmp/.X11-unix/X3
+touch /tmp/.X11-unix/X4
