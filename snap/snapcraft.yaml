@@ -173,6 +173,9 @@ parts:
 #    - falkon         ** built for X11 only
 #    - vlc-plugin-qt  **Hard coded path to vlc
 #    - vlc
+    override-stage: |
+      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/qterminal_drop.desktop
+      snapcraftctl stage
 
   snapcraft-desktop-helpers:
     source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
@@ -218,22 +221,25 @@ parts:
       if [ -e "$SNAPCRAFT_PART_INSTALL/usr/bin/kodi" ]; then
         sed --in-place s'!/usr!${SNAP}/usr!' $SNAPCRAFT_PART_INSTALL/usr/bin/kodi
       fi
+      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/python2.7.desktop
       snapcraftctl stage
     stage-packages:
       - to amd64: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
       - to  i386: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
 
 plugs:
+  # For Mir server to work
   opengl:
-  audio-playback:
-  pulseaudio:
+  network-bind:
+  # For various apps
   alsa:
+  audio-playback:
   avahi-observe:
-#  hardware-observe: if we have this then firefox decides it needs to restart after update
+# hardware-observe: if we have this then firefox decides it needs to restart after update
   locale-control:
   mount-observe:
-  network-bind:
   network-observe:
+  pulseaudio:
   removable-media:
   shutdown:
   system-observe:
