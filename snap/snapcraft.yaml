@@ -146,8 +146,6 @@ parts:
     - libsdl2-mixer-2.0-0
     - libsdl2-net-2.0-0
     # SDL2 games
-    - neverball
-    - neverputt
     - caveexpress
 #    - 0ad          ** Causes snap build to fail
 
