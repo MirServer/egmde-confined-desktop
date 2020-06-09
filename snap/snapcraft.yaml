@@ -58,7 +58,6 @@ apps:
     desktop: usr/share/wayland-sessions/egmde-confined-desktop.desktop
     plugs:
       - login-session-control
-      - wayland
       - x11
     environment:
       # Prep PulseAudio
@@ -72,6 +71,8 @@ apps:
       # Prep PulseAudio
       PULSE_SYSTEM: 1
       PULSE_RUNTIME_PATH: /var/run/pulse
+    slots:
+      - wayland
 
 parts:
   recipe-version:
