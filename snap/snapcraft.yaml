@@ -230,7 +230,17 @@ plugs:
   browser-support: # For thunderbird!
   opengl:
   audio-playback:
+  pulseaudio:
+  alsa:
+  avahi-observe:
+#  hardware-observe: if we have this then firefox decides it needs to restart after update
+  locale-control:
+  mount-observe:
   network-bind:
+  network-observe:
+  removable-media:
+  shutdown:
+  system-observe:
 #  login-session-control:
   # For GTK3+
   gtk-3-themes:
