@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Make PulseAudio socket available inside the snap-specific $XDG_RUNTIME_DIR
+pulsenative="pulse/native"
+pulseaudio_sockpath="$XDG_RUNTIME_DIR/$pulsenative"
+if [ -S "$pulseaudio_sockpath" ]; then
+    export PULSE_SERVER="unix:${pulseaudio_sockpath}"
+fi
