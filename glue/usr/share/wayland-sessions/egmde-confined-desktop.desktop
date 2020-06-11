@@ -1,5 +1,5 @@
 [Desktop Entry]
 Name=egmde (confined)
 Comment=The example Mir server
-Exec=snap run egmde-confined-desktop
+Exec=egmde-confined-desktop
 Type=Application
