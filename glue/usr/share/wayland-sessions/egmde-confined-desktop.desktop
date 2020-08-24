@@ -1,5 +1,5 @@
 [Desktop Entry]
 Name=egmde (confined)
 Comment=The example Mir server
-Exec=egmde-confined-desktop
+Exec=egmde-confined-desktop --env-hacks MIR_MESA_KMS_DISABLE_MODESET_PROBE=1
 Type=Application

@@ -27,8 +27,6 @@ layout:
     symlink: $SNAP/usr/bin/qterminal
   /usr/share/gnome-chess:
     bind: $SNAP/usr/share/gnome-chess
-  /usr/share/glmark2:
-    bind: $SNAP/usr/share/glmark2
   /usr/share/gnuchess:
     bind: $SNAP/usr/share/gnuchess
   /usr/share/gnome-mahjongg:
@@ -235,7 +233,7 @@ plugs:
   alsa:
   audio-playback:
   avahi-observe:
-# hardware-observe: if we have this then firefox decides it needs to restart after update
+  hardware-observe:
   locale-control:
   mount-observe:
   network-observe:
