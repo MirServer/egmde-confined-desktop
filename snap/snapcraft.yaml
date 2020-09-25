@@ -21,6 +21,8 @@ environment:
   QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
   QTCHOOSER_NO_GLOBAL_DIR: 1
   QT_SELECT: snappy-qt5
+  MIR_SERVER_XWAYLAND_PATH: ${SNAP}/usr/bin/Xwayland
+  MIR_SERVER_ENABLE_X11: 1
 
 layout:
   /usr/bin/qterminal:
@@ -51,6 +53,12 @@ layout:
     bind: $SNAP/etc/fonts
   /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir:
     bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/mir
+  /opt/zoom:
+    bind: $SNAP/opt/zoom
+  /usr/bin/zoom:
+    symlink: $SNAP/usr/bin/zoom
+  /usr/bin/xkbcomp:
+    symlink: $SNAP/usr/bin/xkbcomp
 
 apps:
   egmde-confined-desktop:
@@ -95,6 +103,7 @@ parts:
       snapcraftctl set-version $server_version-mir$mir_version-snap$recipe_version
 #      if echo $mir_version | grep dev; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
     plugin: cmake-with-ppa
+    ppa: mir-team/dev
     source: https://github.com/AlanGriffiths/egmde.git
     build-packages:
     - pkg-config
@@ -104,8 +113,7 @@ parts:
     - libwayland-dev
     - libxkbcommon-dev
     stage-packages:
-      - try: [libmiral4]
-      - else: [libmiral3]
+      - libmiral4
       - mir-graphics-drivers-desktop
       - libfreetype6
       - fonts-freefont-ttf
@@ -224,6 +232,63 @@ parts:
     stage-packages:
       - to amd64: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
       - to  i386: [ kodi-wayland, kodi-repository-kodi, kodi-visualization-spectrum, samba-libs ]
+
+  zoom:
+    after: [ zoom-deps ]
+    plugin: dump
+    source: https://zoom.us/client/latest/zoom_amd64.deb
+    override-build: |
+      # remove danging symlink
+      rm -f $SNAPCRAFT_PART_BUILD/usr/bin/zoom
+      echo "QT_QPA_PLATFORM=xcb \$SNAP/opt/zoom/ZoomLauncher" > $SNAPCRAFT_PART_BUILD/usr/bin/zoom
+      chmod +x $SNAPCRAFT_PART_BUILD/usr/bin/zoom
+      # Unfrig LD_LIBRARY_PATH
+      sed -i s/D_LIBRAR/XXXXXXXX/g opt/zoom/ZoomLauncher
+      snapcraftctl build
+    build-attributes: [keep-execstack]
+
+  zoom-deps:
+    plugin: nil
+    stage-packages:
+      - libnspr4
+      - libnss3
+      - libpulse-mainloop-glib0
+      - libqt53dcore5
+      - libqt53dinput5
+      - libqt53dlogic5
+      - libqt53dquick5
+      - libqt53dquickscene2d5
+      - libqt53drender5
+      - libqt5concurrent5
+      - libqt5core5a
+      - libqt5dbus5
+      - libqt5gui5
+      - libqt5multimedia5
+      - libqt5multimedia5-plugins
+      - libqt5network5
+      - libqt5printsupport5
+      - libqt5qml5
+      - libqt5quick5
+      - libqt5quickcontrols2-5
+      - libqt5quickparticles5
+      - libqt5quicktemplates2-5
+      - libqt5sql5
+      - libqt5waylandclient5
+      - libqt5widgets5
+      - libqt5xmlpatterns5
+      - libxcb-image0
+      - libxcb-keysyms1
+      - libxcb-randr0
+      - libxcb-xtest0
+      - libx11-6
+      - libxtst6
+      - pulseaudio-utils
+
+  xwayland:
+    plugin: nil
+    stage-packages:
+      - xwayland
+      - libbz2-1.0
 
 plugs:
   # For Mir server to work
