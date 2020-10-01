@@ -223,48 +223,51 @@ parts:
     plugin: dump
     source: https://zoom.us/client/latest/zoom_amd64.deb
     override-build: |
-      # remove danging symlink
-      rm -f $SNAPCRAFT_PART_BUILD/usr/bin/zoom
-      echo "QT_QPA_PLATFORM=xcb \$SNAP/opt/zoom/ZoomLauncher" > $SNAPCRAFT_PART_BUILD/usr/bin/zoom
-      chmod +x $SNAPCRAFT_PART_BUILD/usr/bin/zoom
-      # Unfrig LD_LIBRARY_PATH
-      sed -i s/D_LIBRAR/XXXXXXXX/g opt/zoom/ZoomLauncher
-      snapcraftctl build
+      if [[ `arch` = "x86_64" ]]; then
+        # remove danging symlink
+        rm -f $SNAPCRAFT_PART_BUILD/usr/bin/zoom
+        echo "QT_QPA_PLATFORM=xcb \$SNAP/opt/zoom/ZoomLauncher" > $SNAPCRAFT_PART_BUILD/usr/bin/zoom
+        chmod +x $SNAPCRAFT_PART_BUILD/usr/bin/zoom
+        # Unfrig LD_LIBRARY_PATH
+        sed -i s/D_LIBRAR/XXXXXXXX/g opt/zoom/ZoomLauncher
+        snapcraftctl build
+      fi
     build-attributes: [keep-execstack]
     stage-packages:
-      - libnspr4
-      - libnss3
-      - libpulse-mainloop-glib0
-      - libqt53dcore5
-      - libqt53dinput5
-      - libqt53dlogic5
-      - libqt53dquick5
-      - libqt53dquickscene2d5
-      - libqt53drender5
-      - libqt5concurrent5
-      - libqt5core5a
-      - libqt5dbus5
-      - libqt5gui5
-      - libqt5multimedia5
-      - libqt5multimedia5-plugins
-      - libqt5network5
-      - libqt5printsupport5
-      - libqt5qml5
-      - libqt5quick5
-      - libqt5quickcontrols2-5
-      - libqt5quickparticles5
-      - libqt5quicktemplates2-5
-      - libqt5sql5
-      - libqt5waylandclient5
-      - libqt5widgets5
-      - libqt5xmlpatterns5
-      - libxcb-image0
-      - libxcb-keysyms1
-      - libxcb-randr0
-      - libxcb-xtest0
-      - libx11-6
-      - libxtst6
-      - pulseaudio-utils
+      - on amd64:
+        - libnspr4
+        - libnss3
+        - libpulse-mainloop-glib0
+        - libqt53dcore5
+        - libqt53dinput5
+        - libqt53dlogic5
+        - libqt53dquick5
+        - libqt53dquickscene2d5
+        - libqt53drender5
+        - libqt5concurrent5
+        - libqt5core5a
+        - libqt5dbus5
+        - libqt5gui5
+        - libqt5multimedia5
+        - libqt5multimedia5-plugins
+        - libqt5network5
+        - libqt5printsupport5
+        - libqt5qml5
+        - libqt5quick5
+        - libqt5quickcontrols2-5
+        - libqt5quickparticles5
+        - libqt5quicktemplates2-5
+        - libqt5sql5
+        - libqt5waylandclient5
+        - libqt5widgets5
+        - libqt5xmlpatterns5
+        - libxcb-image0
+        - libxcb-keysyms1
+        - libxcb-randr0
+        - libxcb-xtest0
+        - libx11-6
+        - libxtst6
+        - pulseaudio-utils
 
   xwayland:
     plugin: nil
