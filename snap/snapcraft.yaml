@@ -220,7 +220,6 @@ parts:
       - va-driver-all
 
   zoom:
-    after: [ zoom-deps ]
     plugin: dump
     source: https://zoom.us/client/latest/zoom_amd64.deb
     override-build: |
@@ -232,9 +231,6 @@ parts:
       sed -i s/D_LIBRAR/XXXXXXXX/g opt/zoom/ZoomLauncher
       snapcraftctl build
     build-attributes: [keep-execstack]
-
-  zoom-deps:
-    plugin: nil
     stage-packages:
       - libnspr4
       - libnss3
