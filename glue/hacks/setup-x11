@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Attempt set up for X11 support (but we don't stop if that fails)
+set +e
+mkdir -p /tmp/.X11-unix
+# We need to stop Mir accessing any existing X11 session.
+# Mir detects existing sessions by scanning /tmp/.X11-unix
+# but we don't have the real /tmp, but a snap specific one.
+# So fake the existing $DISPLAY in the fake /tmp/.X11-unix
+if [ -z "${DISPLAY}" ]
+then touch /tmp/.X11-unix/X${DISPLAY:1}
+fi
+# A few more for luck
+touch /tmp/.X11-unix/X0
+touch /tmp/.X11-unix/X1
+touch /tmp/.X11-unix/X2
+touch /tmp/.X11-unix/X3
+touch /tmp/.X11-unix/X4
+set -e
