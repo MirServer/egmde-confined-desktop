@@ -175,7 +175,8 @@ parts:
   firefox:
     after:
       - snapcraft-desktop-helpers
-    plugin: nil
+    plugin: dump
+    source: firefox
     override-build: |
       snapcraftctl build
       rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/python3.6.desktop
@@ -190,26 +191,8 @@ parts:
       - gnuchess-book
 
   native-apps:
-    plugin: nil
-    override-build: |
-      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/applications/
-      cat > $SNAPCRAFT_PART_INSTALL/usr/share/applications/glmark2-wayland.desktop <<EOF
-      [Desktop Entry]
-      Name=GLMark2 (Wayland)
-      Exec=glmark2-es2-wayland
-      Type=Application
-      Icon=ubuntu-logo
-      Categories=Utility
-      EOF
-      cat > $SNAPCRAFT_PART_INSTALL/usr/share/applications/glmark2-x11.desktop <<EOF
-      [Desktop Entry]
-      Name=GLMark2 (X11)
-      Exec=glmark2-es2
-      Type=Application
-      Icon=ubuntu-logo
-      Categories=Utility
-      EOF
-      snapcraftctl build
+    plugin: dump
+    source: native-apps
     stage-packages:
       - glmark2-es2
       - glmark2-es2-wayland

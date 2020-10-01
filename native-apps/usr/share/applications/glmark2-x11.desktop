@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=GLMark2 (X11)
+Exec=glmark2-es2
+Type=Application
+Icon=ubuntu-logo
+Categories=Utility

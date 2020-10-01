@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=GLMark2 (Wayland)
+Exec=glmark2-es2-wayland
+Type=Application
+Icon=ubuntu-logo
+Categories=Utility
