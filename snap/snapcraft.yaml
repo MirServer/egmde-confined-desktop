@@ -224,7 +224,7 @@ parts:
     source: https://zoom.us/client/latest/zoom_amd64.deb
     override-build: |
       if [[ `arch` = "x86_64" ]]; then
-        # remove danging symlink
+        # remove dangling symlink
         rm -f $SNAPCRAFT_PART_BUILD/usr/bin/zoom
         echo "QT_QPA_PLATFORM=xcb \$SNAP/opt/zoom/ZoomLauncher" > $SNAPCRAFT_PART_BUILD/usr/bin/zoom
         chmod +x $SNAPCRAFT_PART_BUILD/usr/bin/zoom
