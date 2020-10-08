@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # For kodi
-for PLUG in audio-playback audio-record avahi-observe camera locale-control mount-observe network-observe removable-media system-observe x11; do sudo snap connect egmde-confined-desktop:${PLUG}; done
+for PLUG in audio-playback audio-record avahi-observe locale-control mount-observe network-observe removable-media system-observe x11; do sudo snap connect egmde-confined-desktop:${PLUG}; done
 
 # For DM
 sudo snap connect egmde-confined-desktop:login-session-control
