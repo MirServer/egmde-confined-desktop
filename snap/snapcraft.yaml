@@ -223,12 +223,11 @@ parts:
     plugin: dump
     source: https://zoom.us/client/latest/zoom_amd64.deb
     override-build: |
-      if [[ `arch` = "x86_64" ]]; then
-        # remove dangling symlink
+      if [ $(arch) = "x86_64" ]; then
+        echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         rm -f $SNAPCRAFT_PART_BUILD/usr/bin/zoom
-        echo "QT_QPA_PLATFORM=xcb \$SNAP/opt/zoom/ZoomLauncher" > $SNAPCRAFT_PART_BUILD/usr/bin/zoom
+        echo "QT_QPA_PLATFORM=xcb LD_LIBRARY_PATH=\$SNAP/opt/zoom:\$LD_LIBRARY_PATH \$SNAP/opt/zoom/ZoomLauncher" > $SNAPCRAFT_PART_BUILD/usr/bin/zoom
         chmod +x $SNAPCRAFT_PART_BUILD/usr/bin/zoom
-        # Unfrig LD_LIBRARY_PATH
         sed -i s/D_LIBRAR/XXXXXXXX/g opt/zoom/ZoomLauncher
         snapcraftctl build
       fi
@@ -280,15 +279,14 @@ plugs:
   opengl:
   network-bind:
   # For various apps
-  alsa:
   audio-playback:
+  audio-record:
   avahi-observe:
+  camera:
   locale-control:
   mount-observe:
   network-observe:
-  pulseaudio:
   removable-media:
-  shutdown:
   system-observe:
   # For GTK3+
   gtk-3-themes:
