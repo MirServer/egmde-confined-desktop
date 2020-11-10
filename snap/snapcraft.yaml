@@ -21,8 +21,6 @@ environment:
   QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
   QTCHOOSER_NO_GLOBAL_DIR: 1
   QT_SELECT: snappy-qt5
-  MIR_SERVER_XWAYLAND_PATH: ${SNAP}/usr/bin/Xwayland
-  MIR_SERVER_ENABLE_X11: 1
   PYTHONHOME: ${SNAP}/usr/
 
 layout:
@@ -48,10 +46,6 @@ layout:
     bind: $SNAP/etc/fonts
   /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir:
     bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/mir
-  /opt/zoom:
-    bind: $SNAP/opt/zoom
-  /usr/bin/zoom:
-    symlink: $SNAP/usr/bin/zoom
   /usr/bin/xkbcomp:
     symlink: $SNAP/usr/bin/xkbcomp
   /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/kodi:
@@ -218,61 +212,6 @@ parts:
       - libaudio2
       - libsndio7.0
       - va-driver-all
-
-  zoom:
-    plugin: dump
-    source: https://zoom.us/client/latest/zoom_amd64.deb
-    override-build: |
-      if [ $(arch) = "x86_64" ]; then
-        echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-        rm -f $SNAPCRAFT_PART_BUILD/usr/bin/zoom
-        echo "QT_QPA_PLATFORM=xcb LD_LIBRARY_PATH=\$SNAP/opt/zoom:\$LD_LIBRARY_PATH \$SNAP/opt/zoom/ZoomLauncher" > $SNAPCRAFT_PART_BUILD/usr/bin/zoom
-        chmod +x $SNAPCRAFT_PART_BUILD/usr/bin/zoom
-        sed -i s/D_LIBRAR/XXXXXXXX/g opt/zoom/ZoomLauncher
-        snapcraftctl build
-      fi
-    build-attributes: [keep-execstack]
-    stage-packages:
-      - on amd64:
-        - libnspr4
-        - libnss3
-        - libpulse-mainloop-glib0
-        - libqt53dcore5
-        - libqt53dinput5
-        - libqt53dlogic5
-        - libqt53dquick5
-        - libqt53dquickscene2d5
-        - libqt53drender5
-        - libqt5concurrent5
-        - libqt5core5a
-        - libqt5dbus5
-        - libqt5gui5
-        - libqt5multimedia5
-        - libqt5multimedia5-plugins
-        - libqt5network5
-        - libqt5printsupport5
-        - libqt5qml5
-        - libqt5quick5
-        - libqt5quickcontrols2-5
-        - libqt5quickparticles5
-        - libqt5quicktemplates2-5
-        - libqt5sql5
-        - libqt5waylandclient5
-        - libqt5widgets5
-        - libqt5xmlpatterns5
-        - libxcb-image0
-        - libxcb-keysyms1
-        - libxcb-randr0
-        - libxcb-xtest0
-        - libx11-6
-        - libxtst6
-        - pulseaudio-utils
-
-  xwayland:
-    plugin: nil
-    stage-packages:
-      - xwayland
-      - libbz2-1.0
 
 plugs:
   # For Mir server to work
