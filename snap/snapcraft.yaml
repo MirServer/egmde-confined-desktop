@@ -9,7 +9,7 @@ base: core20
 environment:
   SHELL: bash
   LC_ALL: C.UTF-8
-  LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba
+  LD_LIBRARY_PATH: /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba
   PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
   # XDG config
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
@@ -109,7 +109,7 @@ parts:
       mir_version=`LANG=C apt-cache policy mir-graphics-drivers-desktop | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
       recipe_version=`cat $SNAPCRAFT_STAGE/recipe-version`
       snapcraftctl set-version $server_version-mir$mir_version-snap$recipe_version
-#      if echo $mir_version | grep dev; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
+      if echo $mir_version | grep -e '+dev' -e '~rc' -q; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
     plugin: cmake
     source: https://github.com/AlanGriffiths/egmde.git
     override-build: |
@@ -183,6 +183,7 @@ parts:
       - gnome-chess
       - gnuchess
       - gnuchess-book
+      - xfce4-terminal
 
   native-apps:
     plugin: dump
