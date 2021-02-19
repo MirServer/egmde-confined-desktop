@@ -173,6 +173,9 @@ parts:
     plugin: nil
     stage-packages:
       - epiphany-browser
+    override-build: |
+      snapcraftctl build
+      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/epiphany-browser/mime-types-permissions.xml
 
   gtk3-apps:
     plugin: nil
