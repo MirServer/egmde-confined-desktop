@@ -3,13 +3,12 @@ adopt-info: egmde
 summary: A minimal Mir based desktop with some test applications
 description: A minimal Mir based desktop with some test applications for demonstration purposes.
 confinement: strict
-grade: devel
 base: core20
 
 environment:
   SHELL: bash
   LC_ALL: C.UTF-8
-  LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba
+  LD_LIBRARY_PATH: /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba:$SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/epiphany-browser
   PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
   # XDG config
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
@@ -60,6 +59,8 @@ layout:
     bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba
   /usr/share/samba:
     bind: $SNAP/usr/share/samba
+  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/webkit2gtk-4.0:
+    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/webkit2gtk-4.0
 
 apps:
   egmde-confined-desktop:
@@ -109,7 +110,7 @@ parts:
       mir_version=`LANG=C apt-cache policy mir-graphics-drivers-desktop | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
       recipe_version=`cat $SNAPCRAFT_STAGE/recipe-version`
       snapcraftctl set-version $server_version-mir$mir_version-snap$recipe_version
-#      if echo $mir_version | grep dev; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
+      if echo $mir_version | grep -e '+dev' -e '~rc' -q; then snapcraftctl set-grade devel; else snapcraftctl set-grade stable; fi
     plugin: cmake
     source: https://github.com/AlanGriffiths/egmde.git
     override-build: |
@@ -166,16 +167,15 @@ parts:
       # desktop-launch doesn't handle running without a user session very well, this avoids slow startup here
       sed --in-place s'/^  needs_update=true/:/' $SNAPCRAFT_PART_INSTALL/bin/desktop-launch
 
-  firefox:
+  epiphany-browser:
     after:
       - snapcraft-desktop-helpers
-    plugin: dump
-    source: firefox
+    plugin: nil
+    stage-packages:
+      - epiphany-browser
     override-build: |
       snapcraftctl build
-      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/python3.6.desktop
-    stage-packages:
-      - firefox
+      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/epiphany-browser/mime-types-permissions.xml
 
   gtk3-apps:
     plugin: nil
@@ -184,12 +184,22 @@ parts:
       - gnuchess
       - gnuchess-book
 
+  terminal:
+    plugin: nil
+    stage-packages:
+      - xfce4-terminal
+    override-build: |
+      snapcraftctl build
+      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/exo-*
+
   native-apps:
     plugin: dump
     source: native-apps
     stage-packages:
-      - glmark2-es2
       - glmark2-es2-wayland
+    override-build: |
+      snapcraftctl build
+      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/glmark2-x11.desktop
 
   kodi:
     plugin: nil
