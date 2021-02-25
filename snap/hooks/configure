@@ -61,7 +61,10 @@ fi
 
 # display-layout
 display_layout=$(snapctl get display-layout)
-if [ -n "${display_layout}" ]; then
+if [ "$display_layout" = "" ]
+then
+  display_layout=default
+else
   if [ -e "${egmde_display}" ]; then
     if [ -z "$(grep "^  ${display_layout}:" "${egmde_display}")" ]; then
       echo "ERROR: '$display_layout' is not a layout in ${egmde_display}"
@@ -73,57 +76,89 @@ if [ -n "${display_layout}" ]; then
       exit 1
     fi
   fi
-
-  if [ "display-layout=${display_layout}" != "$(grep \^display-layout= ${egmde_config})" ]; then
-    if [ $config_changes -gt 0 ]; then
-      sed '/^display-layout=/d' ${egmde_config}
-    else
-      sed --in-place=.save '/^display-layout=/d' ${egmde_config}
-    fi
-    echo display-layout=${display_layout} >> ${egmde_config}
-    let config_changes+=1
-  fi
 fi
+
+display_layout=$(snapctl get display-layout)
+if [ "display-layout=${display_layout}" != "$(grep \^display-layout= ${egmde_config})" ]; then
+  if [ $config_changes -gt 0 ]; then
+    sed '/^display-layout=/d' ${egmde_config}
+  else
+    sed --in-place=.save '/^display-layout=/d' ${egmde_config}
+  fi
+  echo display-layout=${display_layout} >> ${egmde_config}
+  let config_changes+=1
+fi
+
 
 # vt
 vt=$(snapctl get vt)
-if [ -n "${vt}" ]; then
-  if [ -n "${vt//[0-9]}" ] || [ ! -e "/dev/tty$vt" ] && [ -e "/dev/tty" ]; then
-    echo "ERROR: '$vt' is not a valid VT"
-    exit 1
+if [ "$vt" = "" ]
+then
+  # If 'vt.handoff' is set, Mir only starts first time on the default VT. (#779)
+  # Until we understand and fix properly, set the config the way that works.
+  if ! grep -q snap_core= /proc/cmdline || ! grep -q vt.handoff= /proc/cmdline
+  then snapctl set vt=4
+  else snapctl set vt=0
   fi
-
+else
   if [ "vt=${vt}" != "$(grep vt= ${egmde_config})" ]; then
-    if [ $config_changes -gt 0 ]; then
-      sed '/^vt/d' ${egmde_config}
-    else
-      sed --in-place=.save '/^vt/d' ${egmde_config}
+    if [ -n "${vt//[0-9]}" ] || [ ! -e "/dev/tty$vt" ]; then
+      echo "ERROR: '$vt' is not a valid VT"
+      exit 1
     fi
-    echo vt=${vt} >> ${egmde_config}
-    let config_changes+=1
   fi
 fi
 
+vt=$(snapctl get vt)
+if [ "vt=${vt}" != "$(grep vt= ${egmde_config})" ]; then
+  if [ $config_changes -gt 0 ]; then
+    sed '/^vt/d' ${egmde_config}
+  else
+    sed --in-place=.save '/^vt/d' ${egmde_config}
+  fi
+  echo vt=${vt} >> ${egmde_config}
+  let config_changes+=1
+fi
+
+
 # cursor
 cursor=$(snapctl get cursor)
-if [ -n "${cursor}" ]; then
+if [ "$cursor" = "" ]
+then
+  # Workaround for https://github.com/MirServer/mir-kiosk/issues/23
+  # "Mouse offset from image on Raspberry Pi 3 with Ubuntu Core 18"
+  if grep -q snap_core=core18 /proc/cmdline && grep -q snap_kernel=pi-kernel /proc/cmdline
+  then snapctl set cursor=software
+  else snapctl set cursor=auto
+  fi
+else
   if [[ ! "${cursor}" =~ ^(auto|none|software)$ ]]; then
     echo "ERROR: '$cursor' is not a valid cursor option (auto|none|software)"
     exit 1
   fi
+fi
 
-  if [ "${cursor}" == "none" ]; then
-    cursor="null"
+cursor=$(snapctl get cursor)
+if [ "${cursor}" == "none" ]; then
+  cursor="null"
+fi
+
+if [ "cursor=${cursor}" != "$(grep cursor= $SNAP_USER_DATA/egmde.config)" ]; then
+  if [ $config_changes -gt 0 ]; then
+    sed '/^cursor/d' ${egmde_config}
+  else
+    sed --in-place=.save '/^cursor/d' ${egmde_config}
   fi
+  echo cursor=${cursor} >> ${egmde_config}
+  let config_changes+=1
+fi
 
-  if [ "cursor=${cursor}" != "$(grep cursor= $SNAP_USER_DATA/egmde.config)" ]; then
-    if [ $config_changes -gt 0 ]; then
-      sed '/^cursor/d' ${egmde_config}
-    else
-      sed --in-place=.save '/^cursor/d' ${egmde_config}
-    fi
-    echo cursor=${cursor} >> ${egmde_config}
-    let config_changes+=1
+# daemon
+if [ "$(snapctl get daemon)" = "" ]
+then
+  if grep -q -e snap_core= -e snapd_recovery_mode= /proc/cmdline
+  then snapctl set daemon=true
+  else snapctl set daemon=false
   fi
 fi
 
