@@ -2,7 +2,7 @@
 
 real_wayland=$(dirname "$XDG_RUNTIME_DIR")/${WAYLAND_DISPLAY:-wayland-0}
 
-if [ -O "${real_wayland}" ] && [ -e $SNAP_COMMON/wayland.connected ]
+if [ -O "${real_wayland}" ] && snapctl is-connected wayland
 then
   mkdir -p ${XDG_RUNTIME_DIR}
   ln -sf "${real_wayland}" "$XDG_RUNTIME_DIR"

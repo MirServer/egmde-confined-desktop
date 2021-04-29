@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-if [ "$(id -u)" != 0 ] && [ -z "$DISPLAY" ] && [ ! -e "$SNAP_COMMON/login-session-control.connected" ]; then
+if [ "$(id -u)" != 0 ] && [ -z "$DISPLAY" ] && ! snapctl is-connected login-session-control; then
   echo "ERROR: You need one of: root, a DISPLAY, or to connect the login-session-control interface."
   echo ""
   echo "To connect the login-session-control interface:"
