@@ -8,7 +8,6 @@ base: core20
 environment:
   SHELL: bash
   LC_ALL: C.UTF-8
-  LD_LIBRARY_PATH: /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba:$SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/epiphany-browser
   PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
   # XDG config
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
@@ -26,6 +25,13 @@ environment:
   GDK_PIXBUF_MODULEDIR:      $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders
   GDK_PIXBUF_MODULE_FILE:    $SNAP_COMMON/loaders.cache
   GDK_PIXBUF_QUERY_LOADERS:  $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders
+  # Prep for Mir
+  MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
+  # graphics
+  LD_LIBRARY_PATH:           $SNAP/graphics/lib:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba:$SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/epiphany-browser
+  LIBGL_DRIVERS_PATH:        $SNAP/graphics/dri
+  LIBVA_DRIVERS_PATH:        $SNAP/graphics/dri
+  __EGL_VENDOR_LIBRARY_DIRS: $SNAP/graphics/glvnd/egl_vendor.d
 
 layout:
   /usr/share/gnome-chess:
@@ -40,16 +46,10 @@ layout:
     bind: $SNAP/usr/share/X11/xkb
   /usr/share/fonts/truetype/freefont:
     bind: $SNAP/usr/share/fonts/truetype/freefont
-  /usr/share/glvnd:
-    bind: $SNAP/usr/share/glvnd
-  /etc/glvnd:
-    bind: $SNAP/etc/glvnd
   /etc/gnome-chess:
     bind: $SNAP/etc/gnome-chess
   /etc/fonts:
     bind: $SNAP/etc/fonts
-  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir:
-    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/mir
   /usr/bin/xkbcomp:
     symlink: $SNAP/usr/bin/xkbcomp
   /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/kodi:
@@ -68,6 +68,10 @@ layout:
     bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/webkit2gtk-4.0
   /etc/gtk-3.0:
     bind: $SNAP/etc/gtk-3.0
+  /usr/share/libdrm:  # Needed by mesa-core20 on AMD GPUs
+    bind: $SNAP/graphics/libdrm
+  /usr/share/drirc.d:  # Used by mesa-core20 for app specific workarounds
+    bind: $SNAP/graphics/drirc.d
 
 apps:
   egmde-confined-desktop:
@@ -149,7 +153,6 @@ parts:
   misc:
     plugin: nil
     stage-packages:
-    - libgl1-mesa-dri
     - libxcb1
     - libpulse0
     - libsndfile1
@@ -215,7 +218,28 @@ parts:
       - libpulse0
       - libaudio2
       - libsndio7.0
-      - va-driver-all
+
+  cleanup:
+    after:
+      - egmde
+      - icons
+      - glue
+      - misc
+      - epiphany-browser
+      - gtk3-apps
+      - terminal
+      - native-apps
+      - kodi
+    plugin: nil
+    build-snaps: [ mesa-core20 ]
+    override-prime: |
+      set -eux
+      cd /snap/mesa-core20/current/egl/lib
+      find . -type f,l -exec rm -f $SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/{} \;
+      rm -fr "$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri"
+      for CRUFT in bug drirc.d glvnd libdrm lintian man; do
+        rm -rf "$SNAPCRAFT_PRIME/usr/share/$CRUFT"
+      done
 
 plugs:
   # For Mir server to work
@@ -231,3 +255,7 @@ plugs:
   network-observe:
   removable-media:
   system-observe:
+  graphics-core20:
+    interface: content
+    target: $SNAP/graphics
+    default-provider: mesa-core20
