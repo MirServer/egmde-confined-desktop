@@ -56,8 +56,6 @@ layout:
     bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/kodi
   /usr/share/kodi:
     bind: $SNAP/usr/share/kodi
-  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri:
-    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
   /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:
     bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
   /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba:
