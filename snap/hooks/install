@@ -4,3 +4,8 @@ set -e
 # we install with the daemon disabled, the configure hook
 # will start and enable it if appropriate
 snapctl stop --disable $SNAP_NAME.daemon
+
+# GDK pixbuf setup
+# For unknown reasons LD_LIBRARY_PATH is just "${SNAP}/graphics/lib" when the hook executes
+LD_LIBRARY_PATH=/var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd/void:${SNAP}/graphics/lib:${SNAP}/lib:${SNAP}/usr/lib:${SNAP}/lib/x86_64-linux-gnu:${SNAP}/usr/lib/x86_64-linux-gnu
+"$GDK_PIXBUF_QUERY_LOADERS" > "$GDK_PIXBUF_MODULE_FILE"

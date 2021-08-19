@@ -14,6 +14,7 @@ environment:
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
+  XDG_DATA_DIRS:   $SNAP/usr/share
   # Prep for Qt wayland
   QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
   QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
@@ -21,6 +22,10 @@ environment:
   QTCHOOSER_NO_GLOBAL_DIR: 1
   QT_SELECT: snappy-qt5
   PYTHONHOME: ${SNAP}/usr/
+  # GDK pixbuf
+  GDK_PIXBUF_MODULEDIR:      $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders
+  GDK_PIXBUF_MODULE_FILE:    $SNAP_COMMON/loaders.cache
+  GDK_PIXBUF_QUERY_LOADERS:  $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders
 
 layout:
   /usr/share/gnome-chess:
@@ -61,6 +66,8 @@ layout:
     bind: $SNAP/usr/share/samba
   /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/webkit2gtk-4.0:
     bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/webkit2gtk-4.0
+  /etc/gtk-3.0:
+    bind: $SNAP/etc/gtk-3.0
 
 apps:
   egmde-confined-desktop:
@@ -154,22 +161,7 @@ parts:
     - libgtk3-nocsd0
     - dbus
 
-  snapcraft-desktop-helpers:
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-subdir: gtk
-    plugin: make
-    make-parameters: ["FLAVOR=gtk3"]
-    build-packages:
-      - build-essential
-      - libgtk-3-dev
-    override-build: |
-      snapcraftctl build
-      # desktop-launch doesn't handle running without a user session very well, this avoids slow startup here
-      sed --in-place s'/^  needs_update=true/:/' $SNAPCRAFT_PART_INSTALL/bin/desktop-launch
-
   epiphany-browser:
-    after:
-      - snapcraft-desktop-helpers
     plugin: nil
     stage-packages:
       - epiphany-browser
@@ -188,8 +180,10 @@ parts:
     plugin: nil
     stage-packages:
       - xfce4-terminal
+      - libgdk-pixbuf2.0-bin # GDK pixbuf
     override-build: |
       snapcraftctl build
+      update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
       rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/exo-*
 
   native-apps:
@@ -237,16 +231,3 @@ plugs:
   network-observe:
   removable-media:
   system-observe:
-  # For GTK3+
-  gtk-3-themes:
-    interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes
-  icon-themes:
-    interface: content
-    target: $SNAP/data-dir/icons
-    default-provider: gtk-common-themes
-  sound-themes:
-    interface: content
-    target: $SNAP/data-dir/sounds
-    default-provider: gtk-common-themes
