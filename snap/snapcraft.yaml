@@ -24,7 +24,7 @@ environment:
   # GDK pixbuf
   GDK_PIXBUF_MODULEDIR:      $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders
   GDK_PIXBUF_MODULE_FILE:    $SNAP_COMMON/loaders.cache
-  GDK_PIXBUF_QUERY_LOADERS:  $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders
+  ARCH_TRIPLET:              ${SNAPCRAFT_ARCH_TRIPLET}
   # Prep for Mir
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
   # graphics
