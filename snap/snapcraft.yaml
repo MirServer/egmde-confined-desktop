@@ -10,21 +10,10 @@ environment:
   LC_ALL: C.UTF-8
   PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
   # XDG config
-  XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
-  XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
-  XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
   XDG_DATA_DIRS:   $SNAP/usr/share
-  # Prep for Qt wayland
-  QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
-  QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
-  QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
-  QTCHOOSER_NO_GLOBAL_DIR: 1
-  QT_SELECT: snappy-qt5
-  PYTHONHOME: ${SNAP}/usr/
-  # GDK pixbuf
-  GDK_PIXBUF_MODULEDIR:      $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders
-  GDK_PIXBUF_MODULE_FILE:    $SNAP_COMMON/loaders.cache
-  ARCH_TRIPLET:              ${SNAPCRAFT_ARCH_TRIPLET}
+  XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
+  XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
+  XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
   # Prep for Mir
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
   # graphics
@@ -32,6 +21,17 @@ environment:
   LIBGL_DRIVERS_PATH:        $SNAP/graphics/dri
   LIBVA_DRIVERS_PATH:        $SNAP/graphics/dri
   __EGL_VENDOR_LIBRARY_DIRS: $SNAP/graphics/glvnd/egl_vendor.d
+  # GDK pixbuf
+  GDK_PIXBUF_MODULEDIR:      $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders
+  GDK_PIXBUF_MODULE_FILE:    $SNAP_COMMON/loaders.cache
+  ARCH_TRIPLET:              ${SNAPCRAFT_ARCH_TRIPLET}
+  # Prep for Qt wayland
+  QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
+  QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
+  QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
+  QTCHOOSER_NO_GLOBAL_DIR: 1
+  QT_SELECT: snappy-qt5
+  PYTHONHOME: ${SNAP}/usr/
 
 layout:
   /usr/share/gnome-chess:
@@ -102,7 +102,7 @@ parts:
       git rev-list --count HEAD > $SNAPCRAFT_PART_INSTALL/recipe-version
       snapcraftctl build
     prime:
-      - recipe-version
+      - -recipe-version
 
   ppa-setup:
     plugin: nil
@@ -160,7 +160,17 @@ parts:
     - libglu1-mesa
     - libgpm2
     - libgtk3-nocsd0
-    - dbus
+
+  terminal:
+    plugin: nil
+    stage-packages:
+      - xfce4-terminal
+      - libgdk-pixbuf2.0-bin # GDK pixbuf
+      - libglib2.0-0
+    override-build: |
+      snapcraftctl build
+      update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
+      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/exo-*
 
   epiphany-browser:
     plugin: nil
@@ -176,16 +186,6 @@ parts:
       - gnome-chess
       - gnuchess
       - gnuchess-book
-
-  terminal:
-    plugin: nil
-    stage-packages:
-      - xfce4-terminal
-      - libgdk-pixbuf2.0-bin # GDK pixbuf
-    override-build: |
-      snapcraftctl build
-      update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
-      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/exo-*
 
   native-apps:
     plugin: dump
@@ -243,6 +243,10 @@ plugs:
   # For Mir server to work
   opengl:
   network-bind:
+  graphics-core20:
+    interface: content
+    target: $SNAP/graphics
+    default-provider: mesa-core20
   # For various apps
   audio-playback:
   audio-record:
@@ -253,7 +257,8 @@ plugs:
   network-observe:
   removable-media:
   system-observe:
-  graphics-core20:
-    interface: content
-    target: $SNAP/graphics
-    default-provider: mesa-core20
+
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+  - build-on: armhf
