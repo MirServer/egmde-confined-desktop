@@ -10,6 +10,7 @@ environment:
   LC_ALL: C.UTF-8
   PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
   # XDG config
+  XDG_DATA_HOME:   $SNAP_DATA/.local/usr/share
   XDG_DATA_DIRS:   $SNAP/usr/share
   XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
@@ -23,7 +24,7 @@ environment:
   __EGL_VENDOR_LIBRARY_DIRS: $SNAP/graphics/glvnd/egl_vendor.d
   # GDK pixbuf
   GDK_PIXBUF_MODULEDIR:      $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders
-  GDK_PIXBUF_MODULE_FILE:    $SNAP_COMMON/loaders.cache
+  GDK_PIXBUF_MODULE_FILE:    $SNAP_DATA/.local/usr/share/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
   ARCH_TRIPLET:              ${SNAPCRAFT_ARCH_TRIPLET}
   # Prep for Qt wayland
   QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 # we install with the daemon disabled, the configure hook
@@ -7,5 +7,23 @@ snapctl stop --disable $SNAP_NAME.daemon
 
 # GDK pixbuf setup
 # For unknown reasons LD_LIBRARY_PATH is just "${SNAP}/graphics/lib" when the hook executes
+mkdir -p "$(dirname "$GDK_PIXBUF_MODULE_FILE")"
 LD_LIBRARY_PATH=/var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd/void:${SNAP}/graphics/lib:${SNAP}/lib:${SNAP}/usr/lib:${SNAP}/lib/${ARCH_TRIPLET}:${SNAP}/usr/lib/${ARCH_TRIPLET}
 $SNAP/usr/lib/${ARCH_TRIPLET}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders > "$GDK_PIXBUF_MODULE_FILE"
+
+# GSettings schemas
+GS_SCHEMA_DIR=$XDG_DATA_HOME/glib-2.0/schemas
+mkdir -p "$GS_SCHEMA_DIR"
+
+IFS=':' read -r -a data_dirs_array <<< "$XDG_DATA_DIRS"
+for ((i = 0; i < ${#data_dirs_array[@]}; i++)); do
+  schema_dir="${data_dirs_array[$i]}/glib-2.0/schemas"
+  if [ -n "$(ls -A $schema_dir/*.xml 2>/dev/null)" ]; then
+    ln -s $schema_dir/*.xml $GS_SCHEMA_DIR
+  fi
+  if [ -n "$(ls -A $schema_dir/*.override 2>/dev/null)" ]; then
+    ln -s $schema_dir/*.override $GS_SCHEMA_DIR
+  fi
+done
+
+$SNAP/usr/lib/${ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$GS_SCHEMA_DIR"
