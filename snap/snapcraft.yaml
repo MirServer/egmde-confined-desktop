@@ -192,9 +192,6 @@ parts:
     source: native-apps
     stage-packages:
       - glmark2-es2-wayland
-    override-build: |
-      snapcraftctl build
-      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/glmark2-x11.desktop
 
   kodi:
     plugin: nil
