@@ -10,11 +10,11 @@ environment:
   LC_ALL: C.UTF-8
   PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
   # XDG config
-  XDG_DATA_HOME:   $SNAP_DATA/.local/usr/share
-  XDG_DATA_DIRS:   $SNAP/usr/share
-  XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
-  XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
+  XDG_DATA_HOME:   $SNAP_USER_DATA
+  XDG_DATA_DIRS:   $SNAP/usr/share:$SNAP_DATA
+  XDG_CONFIG_DIRS: $SNAP/etc/xdg
+  XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   # Prep for Mir
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
   # graphics
