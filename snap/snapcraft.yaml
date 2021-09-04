@@ -172,6 +172,7 @@ parts:
       snapcraftctl build
       update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
       rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/exo-*
+      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/xfce4-terminal-settings.desktop
 
   epiphany-browser:
     plugin: nil
