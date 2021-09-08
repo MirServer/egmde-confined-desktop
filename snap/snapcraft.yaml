@@ -29,6 +29,8 @@ environment:
   QTCHOOSER_NO_GLOBAL_DIR: 1
   QT_SELECT: snappy-qt5
   PYTHONHOME: ${SNAP}/usr/
+  # gio
+  GIO_EXTRA_MODULES: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gio/modules
 
 layout:
   /usr/share/gnome-chess:
