@@ -169,16 +169,16 @@ parts:
     override-build: |
       snapcraftctl build
       update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
-      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/exo-*
-      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/xfce4-terminal-settings.desktop
+    prime:
+      - -usr/share/applications/exo-*
+      - -usr/share/applications/xfce4-terminal-settings.desktop
 
   epiphany-browser:
     plugin: nil
     stage-packages:
       - epiphany-browser
-    override-build: |
-      snapcraftctl build
-      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/epiphany-browser/mime-types-permissions.xml
+    prime:
+      - -usr/share/epiphany-browser/mime-types-permissions.xml
 
   gtk3-apps:
     plugin: nil
@@ -200,7 +200,6 @@ parts:
       if [ -e "$SNAPCRAFT_PART_INSTALL/usr/bin/kodi" ]; then
         sed --in-place s'!/usr!${SNAP}/usr!' $SNAPCRAFT_PART_INSTALL/usr/bin/kodi
       fi
-      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/python2.7.desktop
     stage-packages:
       - kodi
       - kodi-wayland
@@ -213,8 +212,10 @@ parts:
       - libpulse0
       - libaudio2
       - libsndio7.0
+    prime:
+      - -usr/share/applications/python2.7.desktop
 
-  cleanup:
+  finish:
     after:
       - egmde
       - icons
