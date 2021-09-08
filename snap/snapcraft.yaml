@@ -12,7 +12,7 @@ environment:
   # XDG config
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
   XDG_DATA_HOME:   $SNAP_USER_DATA
-  XDG_DATA_DIRS:   $SNAP/usr/share:$SNAP_DATA
+  XDG_DATA_DIRS:   $SNAP/usr/share
   XDG_CONFIG_DIRS: $SNAP/etc/xdg
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   # Prep for Mir
@@ -43,8 +43,6 @@ layout:
     bind: $SNAP/usr/share/X11/xkb
   /usr/share/fonts/truetype/freefont:
     bind: $SNAP/usr/share/fonts/truetype/freefont
-  /usr/share/glib-2.0/schemas:
-    bind: $SNAP/usr/share/glib-2.0/schemas
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
     bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
   /etc/gnome-chess:
@@ -244,7 +242,7 @@ parts:
       # Compile the gsettings schemas
       /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$SNAPCRAFT_PRIME/usr/share/glib-2.0/schemas"
       # Index the pixbuf loaders
-      GDK_PIXBUF_MODULEDIR=$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders
+      GDK_PIXBUF_MODULEDIR=$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders \
       "/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
       sed s!$SNAPCRAFT_PRIME!!g --in-place "$SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 
