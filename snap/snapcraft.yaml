@@ -8,12 +8,20 @@ base: core20
 environment:
   SHELL: bash
   LC_ALL: C.UTF-8
-  LD_LIBRARY_PATH: /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba:$SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/epiphany-browser
   PATH: $SNAP/bin/:$SNAP/usr/bin/:${SNAP}/usr/games:${PATH}
   # XDG config
-  XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
-  XDG_CONFIG_DIRS: ${SNAP}/etc/xdg:$XDG_CONFIG_DIRS
   XDG_CONFIG_HOME: $SNAP_USER_DATA/.config
+  XDG_DATA_HOME:   $SNAP_USER_DATA
+  XDG_DATA_DIRS:   $SNAP/usr/share
+  XDG_CONFIG_DIRS: $SNAP/etc/xdg
+  XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
+  # Prep for Mir
+  MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
+  # graphics
+  LD_LIBRARY_PATH:           $SNAP/graphics/lib:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba:$SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/epiphany-browser
+  LIBGL_DRIVERS_PATH:        $SNAP/graphics/dri
+  LIBVA_DRIVERS_PATH:        $SNAP/graphics/dri
+  __EGL_VENDOR_LIBRARY_DIRS: $SNAP/graphics/glvnd/egl_vendor.d
   # Prep for Qt wayland
   QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
   QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
@@ -21,6 +29,8 @@ environment:
   QTCHOOSER_NO_GLOBAL_DIR: 1
   QT_SELECT: snappy-qt5
   PYTHONHOME: ${SNAP}/usr/
+  # gio
+  GIO_EXTRA_MODULES: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gio/modules
 
 layout:
   /usr/share/gnome-chess:
@@ -35,24 +45,18 @@ layout:
     bind: $SNAP/usr/share/X11/xkb
   /usr/share/fonts/truetype/freefont:
     bind: $SNAP/usr/share/fonts/truetype/freefont
-  /usr/share/glvnd:
-    bind: $SNAP/usr/share/glvnd
-  /etc/glvnd:
-    bind: $SNAP/etc/glvnd
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
   /etc/gnome-chess:
     bind: $SNAP/etc/gnome-chess
   /etc/fonts:
     bind: $SNAP/etc/fonts
-  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir:
-    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/mir
   /usr/bin/xkbcomp:
     symlink: $SNAP/usr/bin/xkbcomp
   /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/kodi:
     bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/kodi
   /usr/share/kodi:
     bind: $SNAP/usr/share/kodi
-  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri:
-    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri
   /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:
     bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
   /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba:
@@ -61,6 +65,12 @@ layout:
     bind: $SNAP/usr/share/samba
   /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/webkit2gtk-4.0:
     bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/webkit2gtk-4.0
+  /etc/gtk-3.0:
+    bind: $SNAP/etc/gtk-3.0
+  /usr/share/libdrm:  # Needed by mesa-core20 on AMD GPUs
+    bind: $SNAP/graphics/libdrm
+  /usr/share/drirc.d:  # Used by mesa-core20 for app specific workarounds
+    bind: $SNAP/graphics/drirc.d
 
 apps:
   egmde-confined-desktop:
@@ -93,7 +103,7 @@ parts:
       git rev-list --count HEAD > $SNAPCRAFT_PART_INSTALL/recipe-version
       snapcraftctl build
     prime:
-      - recipe-version
+      - -recipe-version
 
   ppa-setup:
     plugin: nil
@@ -142,7 +152,6 @@ parts:
   misc:
     plugin: nil
     stage-packages:
-    - libgl1-mesa-dri
     - libxcb1
     - libpulse0
     - libsndfile1
@@ -152,30 +161,26 @@ parts:
     - libglu1-mesa
     - libgpm2
     - libgtk3-nocsd0
-    - dbus
 
-  snapcraft-desktop-helpers:
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-subdir: gtk
-    plugin: make
-    make-parameters: ["FLAVOR=gtk3"]
-    build-packages:
-      - build-essential
-      - libgtk-3-dev
+  terminal:
+    plugin: nil
+    stage-packages:
+      - xfce4-terminal
+      - libgdk-pixbuf2.0-bin # GDK pixbuf
+      - libglib2.0-0
     override-build: |
       snapcraftctl build
-      # desktop-launch doesn't handle running without a user session very well, this avoids slow startup here
-      sed --in-place s'/^  needs_update=true/:/' $SNAPCRAFT_PART_INSTALL/bin/desktop-launch
+      update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
+    prime:
+      - -usr/share/applications/exo-*
+      - -usr/share/applications/xfce4-terminal-settings.desktop
 
   epiphany-browser:
-    after:
-      - snapcraft-desktop-helpers
     plugin: nil
     stage-packages:
       - epiphany-browser
-    override-build: |
-      snapcraftctl build
-      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/epiphany-browser/mime-types-permissions.xml
+    prime:
+      - -usr/share/epiphany-browser/mime-types-permissions.xml
 
   gtk3-apps:
     plugin: nil
@@ -184,22 +189,11 @@ parts:
       - gnuchess
       - gnuchess-book
 
-  terminal:
-    plugin: nil
-    stage-packages:
-      - xfce4-terminal
-    override-build: |
-      snapcraftctl build
-      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/exo-*
-
   native-apps:
     plugin: dump
     source: native-apps
     stage-packages:
       - glmark2-es2-wayland
-    override-build: |
-      snapcraftctl build
-      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/glmark2-x11.desktop
 
   kodi:
     plugin: nil
@@ -208,7 +202,6 @@ parts:
       if [ -e "$SNAPCRAFT_PART_INSTALL/usr/bin/kodi" ]; then
         sed --in-place s'!/usr!${SNAP}/usr!' $SNAPCRAFT_PART_INSTALL/usr/bin/kodi
       fi
-      rm -f $SNAPCRAFT_PART_INSTALL/usr/share/applications/python2.7.desktop
     stage-packages:
       - kodi
       - kodi-wayland
@@ -221,12 +214,49 @@ parts:
       - libpulse0
       - libaudio2
       - libsndio7.0
-      - va-driver-all
+    prime:
+      - -usr/share/applications/python2.7.desktop
+
+  finish:
+    after:
+      - egmde
+      - icons
+      - glue
+      - misc
+      - epiphany-browser
+      - gtk3-apps
+      - terminal
+      - native-apps
+      - kodi
+    plugin: nil
+    build-packages:
+      - libglib2.0-0
+      - libgdk-pixbuf2.0-0
+      - librsvg2-dev # So the libpixbufloader-svg.so loader can be loaded by gdk-pixbuf-query-loaders
+    build-snaps: [ mesa-core20 ]
+    override-prime: |
+      set -eux
+      cd /snap/mesa-core20/current/egl/lib
+      find . -type f,l -exec rm -f $SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/{} \;
+      rm -fr "$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri"
+      for CRUFT in bug drirc.d glvnd libdrm lintian man; do
+        rm -rf "$SNAPCRAFT_PRIME/usr/share/$CRUFT"
+      done
+      # Compile the gsettings schemas
+      /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$SNAPCRAFT_PRIME/usr/share/glib-2.0/schemas"
+      # Index the pixbuf loaders
+      GDK_PIXBUF_MODULEDIR=$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders \
+      "/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+      sed s!$SNAPCRAFT_PRIME!!g --in-place "$SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 
 plugs:
   # For Mir server to work
   opengl:
   network-bind:
+  graphics-core20:
+    interface: content
+    target: $SNAP/graphics
+    default-provider: mesa-core20
   # For various apps
   audio-playback:
   audio-record:
@@ -237,16 +267,8 @@ plugs:
   network-observe:
   removable-media:
   system-observe:
-  # For GTK3+
-  gtk-3-themes:
-    interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes
-  icon-themes:
-    interface: content
-    target: $SNAP/data-dir/icons
-    default-provider: gtk-common-themes
-  sound-themes:
-    interface: content
-    target: $SNAP/data-dir/sounds
-    default-provider: gtk-common-themes
+
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+  - build-on: armhf

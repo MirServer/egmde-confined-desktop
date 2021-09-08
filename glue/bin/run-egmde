@@ -21,4 +21,4 @@ mkdir -p "$XDG_CACHE_HOME"
 for hack in $(find "${SNAP}/hacks" -name setup-\*); do . "$hack"; done
 
 cd
-exec desktop-launch "$SNAP/usr/local/bin/egmde" "$@"
+exec "$SNAP/usr/local/bin/egmde" "$@"
