@@ -4,6 +4,7 @@ summary: A minimal Mir based desktop with some test applications
 description: A minimal Mir based desktop with some test applications for demonstration purposes.
 confinement: strict
 base: core20
+compression: lzo
 
 environment:
   SHELL: bash
@@ -156,7 +157,6 @@ parts:
     plugin: nil
     stage-packages:
       - xfce4-terminal
-      - libgdk-pixbuf2.0-bin # GDK pixbuf
       - libglib2.0-0
     override-build: |
       snapcraftctl build
@@ -174,10 +174,30 @@ parts:
 
   gtk3-apps:
     plugin: nil
+    build-packages:
+      - libgdk-pixbuf2.0-0
+      - librsvg2-common
+      - shared-mime-info
+    override-build: |
+      # Update mime database
+      update-mime-database ${SNAPCRAFT_PART_INSTALL}/usr/share/mime
     stage-packages:
+      - librsvg2-common
+      - gsettings-desktop-schemas
+      - libglib2.0-bin
       - gnome-chess
       - gnuchess
       - gnuchess-book
+    override-prime: |
+      snapcraftctl prime
+      # Compile the gsettings schemas
+      /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$SNAPCRAFT_PRIME/usr/share/glib-2.0/schemas"
+      # Index the pixbuf loaders
+      LOADERS_PATH=$(echo ${SNAPCRAFT_PRIME}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/*/loaders)
+      QUERY_LOADERS=/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders
+      GDK_PIXBUF_MODULEDIR=${LOADERS_PATH} ${QUERY_LOADERS} > ${LOADERS_PATH}/../loaders.cache
+      sed s!$SNAPCRAFT_PRIME!!g --in-place ${LOADERS_PATH}/../loaders.cache
+
 
   native-apps:
     plugin: dump
@@ -207,7 +227,7 @@ parts:
     prime:
       - -usr/share/applications/python2.7.desktop
 
-  finish:
+  cleanup:
     after:
       - egmde
       - icons
@@ -219,25 +239,14 @@ parts:
       - native-apps
       - kodi
     plugin: nil
-    build-packages:
-      - libglib2.0-0
-      - libgdk-pixbuf2.0-0
-      - librsvg2-dev # So the libpixbufloader-svg.so loader can be loaded by gdk-pixbuf-query-loaders
     build-snaps: [ mesa-core20 ]
     override-prime: |
       set -eux
       cd /snap/mesa-core20/current/egl/lib
       find . -type f,l -exec rm -f $SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/{} \;
       rm -fr "$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri"
-      for CRUFT in bug drirc.d glvnd libdrm lintian man; do
-        rm -rf "$SNAPCRAFT_PRIME/usr/share/$CRUFT"
-      done
-      # Compile the gsettings schemas
-      /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$SNAPCRAFT_PRIME/usr/share/glib-2.0/schemas"
-      # Index the pixbuf loaders
-      GDK_PIXBUF_MODULEDIR=$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders \
-      "/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders" > "$SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
-      sed s!$SNAPCRAFT_PRIME!!g --in-place "$SNAPCRAFT_PRIME/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+      cd  "$SNAPCRAFT_PRIME/usr/share/"
+      rm -rf bug drirc.d glvnd libdrm lintian man
 
 plugs:
   # For Mir server to work
