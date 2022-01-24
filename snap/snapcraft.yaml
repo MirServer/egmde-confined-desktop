@@ -44,8 +44,8 @@ layout:
     bind: $SNAP/usr/share/glmark2
   /usr/share/X11/xkb:
     bind: $SNAP/usr/share/X11/xkb
-  /usr/share/fonts/truetype/freefont:
-    bind: $SNAP/usr/share/fonts/truetype/freefont
+  /usr/share/fonts:
+    bind: $SNAP/usr/share/fonts
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
     bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
   /etc/gnome-chess:
@@ -72,6 +72,10 @@ layout:
     bind: $SNAP/graphics/libdrm
   /usr/share/drirc.d:  # Used by mesa-core20 for app specific workarounds
     bind: $SNAP/graphics/drirc.d
+  /usr/share/libinput:
+    bind: $SNAP/usr/share/libinput
+  /etc/libinput:
+    bind: $SNAP/etc/libinput
 
 apps:
   egmde-confined-desktop:
