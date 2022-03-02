@@ -99,6 +99,14 @@ apps:
     slots:
       - wayland
 
+  vnc:
+    command: bin/run-egmde
+    command-chain:
+      - bin/run-vnc
+    environment:
+      # Prep PulseAudio
+      PULSE_SERVER: unix:$XDG_RUNTIME_DIR/../pulse/native
+
 parts:
   recipe-version:
     plugin: nil
@@ -231,6 +239,14 @@ parts:
     prime:
       - -usr/share/applications/python2.7.desktop
 
+  vnc:
+    plugin: nil
+    stage-packages:
+      - xvfb
+      - x11vnc
+      - inotify-tools
+      - util-linux
+
   cleanup:
     after:
       - egmde
@@ -242,6 +258,7 @@ parts:
       - terminal
       - native-apps
       - kodi
+      - vnc
     plugin: nil
     build-snaps: [ mesa-core20 ]
     override-prime: |
