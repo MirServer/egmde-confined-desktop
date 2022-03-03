@@ -246,6 +246,8 @@ parts:
       - x11vnc
       - inotify-tools
       - util-linux
+    stage:
+      - -usr/share/applications
 
   cleanup:
     after:
