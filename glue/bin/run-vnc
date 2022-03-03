@@ -1,10 +1,20 @@
 #!/bin/bash
 set -ex
 
+if snapctl is-connected x11; then
+  echo Cannot initialize VNC environment please disconnect $SNAP_NAME:x11
+  exit 1
+fi
+
 mkdir -p "$XDG_RUNTIME_DIR" -m 700
 mkdir -p "$XDG_CACHE_HOME"
+mkdir -p /tmp/.X11-unix
 
 DISPLAY_NO=66
+while [ -e "/tmp/.X${DISPLAY_NO}-lock" ]; do
+  let DISPLAY_NO+=1
+done
+
 DISPLAY=:${DISPLAY_NO}
 x11_auth_file=$(mktemp --tmpdir="${XDG_RUNTIME_DIR}")
 
@@ -27,6 +37,6 @@ do
   inotifywait -qq --timeout 5 --event create $(dirname "${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}")
 done
 
-env -u WAYLAND_DISPLAY x11vnc -display ${DISPLAY} -bg -nopw -listen localhost -xkb -auth ${x11_auth_file} -ncache 10
+env -u WAYLAND_DISPLAY x11vnc -display ${DISPLAY} -bg -nopw -listen localhost -xkb -auth ${x11_auth_file} -ncache 10 -forever -alwaysshared
 
 wait
