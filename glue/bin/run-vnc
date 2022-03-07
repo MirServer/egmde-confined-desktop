@@ -1,0 +1,42 @@
+#!/bin/bash
+set -ex
+
+if snapctl is-connected x11; then
+  echo Cannot initialize VNC environment, please disconnect $SNAP_INSTANCE_NAME:x11
+  exit 1
+fi
+
+mkdir -p "$XDG_RUNTIME_DIR" -m 700
+mkdir -p "$XDG_CACHE_HOME"
+mkdir -p /tmp/.X11-unix
+
+DISPLAY_NO=66
+while [ -e "/tmp/.X${DISPLAY_NO}-lock" ]; do
+  let DISPLAY_NO+=1
+done
+
+DISPLAY=:${DISPLAY_NO}
+x11_auth_file=$(mktemp --tmpdir="${XDG_RUNTIME_DIR}")
+
+# If there's already a compositor for WAYLAND_DISPLAY choose another
+if [ -O "${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}" ]; then
+  port=0
+  while [ -e "${XDG_RUNTIME_DIR}/wayland-${port}" ]; do
+    let port+=1
+  done
+  WAYLAND_DISPLAY=wayland-${port}
+fi
+
+xvfb-run --auth-file=${x11_auth_file} --server-num=${DISPLAY_NO} "$@"&
+xvfb_pid=$!
+
+trap "kill $xvfb_pid" INT TERM
+
+until [ -O "${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}" ]
+do
+  inotifywait -qq --timeout 5 --event create $(dirname "${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}")
+done
+
+env -u WAYLAND_DISPLAY x11vnc -display ${DISPLAY} -bg -nopw -listen localhost -xkb -auth ${x11_auth_file} -ncache 10 -forever -alwaysshared
+
+wait
