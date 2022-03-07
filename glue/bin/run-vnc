@@ -32,11 +32,15 @@ xvfb_pid=$!
 
 trap "kill $xvfb_pid" INT TERM
 
-until [ -O "${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}" ]
+until
+  inotifywait --event create "$(dirname "${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}")"&
+  inotify_pid=$!
+  [ -O "${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}" ]
 do
-  inotifywait -qq --timeout 5 --event create $(dirname "${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}")
+  wait "${inotify_pid}"
 done
+kill "${inotify_pid}"
 
-env -u WAYLAND_DISPLAY x11vnc -display ${DISPLAY} -bg -nopw -listen localhost -xkb -auth ${x11_auth_file} -ncache 10 -forever -alwaysshared
+env -u WAYLAND_DISPLAY x11vnc -display ${DISPLAY} -bg -nopw -listen localhost -xkb -auth ${x11_auth_file} -ncache 0 -forever -alwaysshared
 
 wait
