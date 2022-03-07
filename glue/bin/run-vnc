@@ -2,7 +2,7 @@
 set -ex
 
 if snapctl is-connected x11; then
-  echo Cannot initialize VNC environment please disconnect $SNAP_NAME:x11
+  echo Cannot initialize VNC environment, please disconnect $SNAP_INSTANCE_NAME:x11
   exit 1
 fi
 
