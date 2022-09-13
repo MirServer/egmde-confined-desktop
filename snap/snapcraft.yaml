@@ -137,7 +137,7 @@ parts:
     - libwayland-dev
     - libxkbcommon-dev
     stage-packages:
-      - libmiral4
+      - libmiral5
       - mir-graphics-drivers-desktop
       - libfreetype6
       - fonts-freefont-ttf
