@@ -18,6 +18,10 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v2
 
+    - name: Patch Mir channel
+      run: |
+        sed -i 's@- mir-core20@\0/latest/edge@' snap/snapcraft.yaml
+
     - name: Build and publish the snap
       uses: canonical/actions/build-snap@release
       with:
