@@ -3,7 +3,7 @@ adopt-info: egmde
 summary: A minimal Mir based desktop with some test applications
 description: A minimal Mir based desktop with some test applications for demonstration purposes.
 confinement: strict
-base: core20
+base: core22
 compression: lzo
 
 environment:
@@ -19,10 +19,7 @@ environment:
   # Prep for Mir
   MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
   # graphics
-  LD_LIBRARY_PATH:           $SNAP/graphics/lib:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba:$SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/epiphany-browser
-  LIBGL_DRIVERS_PATH:        $SNAP/graphics/dri
-  LIBVA_DRIVERS_PATH:        $SNAP/graphics/dri
-  __EGL_VENDOR_LIBRARY_DIRS: $SNAP/graphics/glvnd/egl_vendor.d
+  LD_LIBRARY_PATH:           /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba:$SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/epiphany-browser:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}
   # Prep for Qt wayland
   QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
   QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
@@ -68,10 +65,10 @@ layout:
     bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/webkit2gtk-4.0
   /etc/gtk-3.0:
     bind: $SNAP/etc/gtk-3.0
-  /usr/share/libdrm:  # Needed by mesa-core20 on AMD GPUs
+  /usr/share/libdrm:  # Needed by mesa-core22 on AMD GPUs
     bind: $SNAP/graphics/libdrm
-  /usr/share/drirc.d:  # Used by mesa-core20 for app specific workarounds
-    bind: $SNAP/graphics/drirc.d
+  /usr/share/drirc.d:  # Used by mesa-core22 for app specific workarounds
+    symlink: $SNAP/graphics/drirc.d
   /usr/share/libinput:
     bind: $SNAP/usr/share/libinput
   /etc/libinput:
@@ -79,6 +76,8 @@ layout:
 
 apps:
   egmde-confined-desktop:
+    command-chain:
+      - bin/setup-graphics
     command: bin/run-egmde
     desktop: usr/share/wayland-sessions/egmde-confined-desktop.desktop
     plugs:
@@ -89,6 +88,8 @@ apps:
       PULSE_SERVER: unix:$XDG_RUNTIME_DIR/../pulse/native
 
   daemon:
+    command-chain:
+      - bin/setup-graphics
     command: bin/run-egmde-daemon
     daemon: simple
     restart-condition: on-failure
@@ -171,7 +172,7 @@ parts:
       - xfce4-terminal
       - libglib2.0-0
     override-build: |
-      snapcraftctl build
+      craftctl default
       update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
     prime:
       - -usr/share/applications/exo-*
@@ -201,7 +202,7 @@ parts:
       - gnuchess
       - gnuchess-book
     override-prime: |
-      snapcraftctl prime
+      craftctl default
       # Compile the gsettings schemas
       /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$SNAPCRAFT_PRIME/usr/share/glib-2.0/schemas"
       # Index the pixbuf loaders
@@ -220,13 +221,12 @@ parts:
   kodi:
     plugin: nil
     override-build: |
-      snapcraftctl build
+      craftctl default
       if [ -e "$SNAPCRAFT_PART_INSTALL/usr/bin/kodi" ]; then
         sed --in-place s'!/usr!${SNAP}/usr!' $SNAPCRAFT_PART_INSTALL/usr/bin/kodi
       fi
     stage-packages:
       - kodi
-      - kodi-wayland
       - kodi-repository-kodi
       - kodi-visualization-spectrum
       - samba-libs
@@ -262,23 +262,22 @@ parts:
       - kodi
       - vnc
     plugin: nil
-    build-snaps: [ mesa-core20 ]
+    build-snaps: [ mesa-core22/edge ]
     override-prime: |
       set -eux
-      cd /snap/mesa-core20/current/egl/lib
-      find . -type f,l -exec rm -f $SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/{} \;
-      rm -fr "$SNAPCRAFT_PRIME/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/dri"
-      cd  "$SNAPCRAFT_PRIME/usr/share/"
+      cd /snap/mesa-core22/current/
+      #find . -type f,l -exec rm -f $CRAFT_PRIME/{} \;
+      cd  "$CRAFT_PRIME/usr/share/"
       rm -rf bug drirc.d glvnd libdrm lintian man
 
 plugs:
   # For Mir server to work
   opengl:
   network-bind:
-  graphics-core20:
+  graphics-core22:
     interface: content
     target: $SNAP/graphics
-    default-provider: mesa-core20
+    default-provider: mesa-core22/edge
   # For various apps
   audio-playback:
   audio-record:
