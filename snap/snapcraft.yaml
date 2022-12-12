@@ -17,18 +17,18 @@ environment:
   XDG_CONFIG_DIRS: $SNAP/etc/xdg
   XDG_CACHE_HOME:  $SNAP_USER_COMMON/.cache
   # Prep for Mir
-  MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/mir/server-platform
+  MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/mir/server-platform
   # graphics
-  LD_LIBRARY_PATH:           /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba:$SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/epiphany-browser:${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}
+  LD_LIBRARY_PATH:           /usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio:/usr/lib/${CRAFT_ARCH_TRIPLET}/samba:$SNAP/usr/lib/${CRAFT_ARCH_TRIPLET}/epiphany-browser:${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}
   # Prep for Qt wayland
-  QT_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/
-  QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
-  QML2_IMPORT_PATH: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/qt5/qml
+  QT_PLUGIN_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/qt5/plugins/
+  QT_QPA_PLATFORM_PLUGIN_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/qt5/plugins/platforms/
+  QML2_IMPORT_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/qt5/qml
   QTCHOOSER_NO_GLOBAL_DIR: 1
   QT_SELECT: snappy-qt5
   PYTHONHOME: ${SNAP}/usr/
   # gio
-  GIO_EXTRA_MODULES: ${SNAP}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gio/modules
+  GIO_EXTRA_MODULES: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/gio/modules
 
 layout:
   /usr/share/gnome-chess:
@@ -43,26 +43,26 @@ layout:
     bind: $SNAP/usr/share/X11/xkb
   /usr/share/fonts:
     bind: $SNAP/usr/share/fonts
-  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
-    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
+  /usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0:
+    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/gdk-pixbuf-2.0
   /etc/gnome-chess:
     bind: $SNAP/etc/gnome-chess
   /etc/fonts:
     bind: $SNAP/etc/fonts
   /usr/bin/xkbcomp:
     symlink: $SNAP/usr/bin/xkbcomp
-  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/kodi:
-    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/kodi
+  /usr/lib/${CRAFT_ARCH_TRIPLET}/kodi:
+    bind: $SNAP/usr/lib/${CRAFT_ARCH_TRIPLET}/kodi
   /usr/share/kodi:
     bind: $SNAP/usr/share/kodi
-  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio:
-    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/pulseaudio
-  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba:
-    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/samba
+  /usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio:
+    bind: $SNAP/usr/lib/${CRAFT_ARCH_TRIPLET}/pulseaudio
+  /usr/lib/${CRAFT_ARCH_TRIPLET}/samba:
+    bind: $SNAP/usr/lib/${CRAFT_ARCH_TRIPLET}/samba
   /usr/share/samba:
     bind: $SNAP/usr/share/samba
-  /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/webkit2gtk-4.0:
-    bind: $SNAP/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/webkit2gtk-4.0
+  /usr/lib/${CRAFT_ARCH_TRIPLET}/webkit2gtk-4.0:
+    bind: $SNAP/usr/lib/${CRAFT_ARCH_TRIPLET}/webkit2gtk-4.0
   /etc/gtk-3.0:
     bind: $SNAP/etc/gtk-3.0
   /usr/share/libdrm:  # Needed by mesa-core22 on AMD GPUs
@@ -115,7 +115,7 @@ parts:
       craftctl default
       server_version=`git rev-list --count HEAD`
       mir_version=`LANG=C apt-cache policy mir-graphics-drivers-desktop | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
-      recipe_version=`git -C ${SNAPCRAFT_PROJECT_DIR} rev-list --count HEAD`
+      recipe_version=`git -C ${CRAFT_PROJECT_DIR} rev-list --count HEAD`
       craftctl set version=$server_version-mir$mir_version-snap$recipe_version
       if echo $mir_version | grep -e '+dev' -e '~rc' -q; then craftctl set grade=devel; else craftctl set grade=stable; fi
     plugin: cmake
@@ -163,7 +163,7 @@ parts:
       - libglib2.0-0
     override-build: |
       craftctl default
-      update-mime-database $SNAPCRAFT_PART_INSTALL/usr/share/mime
+      update-mime-database $CRAFT_PART_INSTALL/usr/share/mime
     prime:
       - -usr/share/applications/exo-*
       - -usr/share/applications/xfce4-terminal-settings.desktop
@@ -183,7 +183,7 @@ parts:
       - shared-mime-info
     override-build: |
       # Update mime database
-      update-mime-database ${SNAPCRAFT_PART_INSTALL}/usr/share/mime
+      update-mime-database ${CRAFT_PART_INSTALL}/usr/share/mime
     stage-packages:
       - librsvg2-common
       - gsettings-desktop-schemas
@@ -194,12 +194,12 @@ parts:
     override-prime: |
       craftctl default
       # Compile the gsettings schemas
-      /usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$SNAPCRAFT_PRIME/usr/share/glib-2.0/schemas"
+      /usr/lib/${CRAFT_ARCH_TRIPLET}/glib-2.0/glib-compile-schemas "$CRAFT_PRIME/usr/share/glib-2.0/schemas"
       # Index the pixbuf loaders
-      LOADERS_PATH=$(echo ${SNAPCRAFT_PRIME}/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/*/loaders)
-      QUERY_LOADERS=/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders
+      LOADERS_PATH=$(echo ${CRAFT_PRIME}/usr/lib/${CRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/*/loaders)
+      QUERY_LOADERS=/usr/lib/${CRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders
       GDK_PIXBUF_MODULEDIR=${LOADERS_PATH} ${QUERY_LOADERS} > ${LOADERS_PATH}/../loaders.cache
-      sed s!$SNAPCRAFT_PRIME!!g --in-place ${LOADERS_PATH}/../loaders.cache
+      sed s!$CRAFT_PRIME!!g --in-place ${LOADERS_PATH}/../loaders.cache
 
 
   native-apps:
@@ -212,8 +212,8 @@ parts:
     plugin: nil
     override-build: |
       craftctl default
-      if [ -e "$SNAPCRAFT_PART_INSTALL/usr/bin/kodi" ]; then
-        sed --in-place s'!/usr!${SNAP}/usr!' $SNAPCRAFT_PART_INSTALL/usr/bin/kodi
+      if [ -e "$CRAFT_PART_INSTALL/usr/bin/kodi" ]; then
+        sed --in-place s'!/usr!${SNAP}/usr!' $CRAFT_PART_INSTALL/usr/bin/kodi
       fi
     stage-packages:
       - kodi
