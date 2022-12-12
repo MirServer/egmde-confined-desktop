@@ -110,11 +110,21 @@ apps:
       PULSE_SERVER: unix:$XDG_RUNTIME_DIR/../pulse/native
 
 parts:
+  mir:
+    plugin: nil
+    stage-snaps:
+    - mir-libs
+    prime:
+    - -*.h
+    - -*.pc
+    - -share
+
   egmde:
-    override-pull: |
+    after: [mir]
+    override-build: |
       craftctl default
-      server_version=`git rev-list --count HEAD`
-      mir_version=`LANG=C apt-cache policy mir-graphics-drivers-desktop | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
+      server_version=`git -C ${CRAFT_PART_SRC} rev-list --count HEAD`
+      mir_version=$( sed -rne 's/^version:\s+([^-]*)-.+$/\1/p' ${CRAFT_STAGE}/meta.mir-libs/snap.yaml )
       recipe_version=`git -C ${CRAFT_PROJECT_DIR} rev-list --count HEAD`
       craftctl set version=$server_version-mir$mir_version-snap$recipe_version
       if echo $mir_version | grep -e '+dev' -e '~rc' -q; then craftctl set grade=devel; else craftctl set grade=stable; fi
@@ -122,14 +132,13 @@ parts:
     source: https://github.com/AlanGriffiths/egmde.git
     build-packages:
     - pkg-config
-    - libmiral-dev
     - libboost-filesystem-dev
     - libfreetype6-dev
     - libwayland-dev
     - libxkbcommon-dev
+    build-environment:
+    - LD_LIBRARY_PATH: ${CRAFT_STAGE}/usr/lib/${CRAFT_ARCH_TRIPLET}
     stage-packages:
-      - libmiral5
-      - mir-graphics-drivers-desktop
       - libfreetype6
       - fonts-freefont-ttf
     stage:
@@ -283,7 +292,3 @@ architectures:
   - build-on: amd64
   - build-on: arm64
   - build-on: armhf
-
-package-repositories:
-  - type: apt
-    ppa: mir-team/release
