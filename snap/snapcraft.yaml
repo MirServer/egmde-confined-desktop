@@ -261,10 +261,10 @@ parts:
       - kodi
       - vnc
     plugin: nil
-    build-snaps: [ mesa-core22/edge ]
+    build-snaps: [ mesa-core22-test/edge ]
     override-prime: |
       set -eux
-      cd /snap/mesa-core22/current/
+      cd /snap/mesa-core22-test/current/
       #find . -type f,l -exec rm -f $CRAFT_PRIME/{} \;
       cd  "$CRAFT_PRIME/usr/share/"
       rm -rf bug drirc.d glvnd libdrm lintian man
@@ -276,7 +276,7 @@ plugs:
   graphics-core22:
     interface: content
     target: $SNAP/graphics
-    default-provider: mesa-core22/edge
+    default-provider: mesa-core22-test/edge
   # For various apps
   audio-playback:
   audio-record:
